@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * chop_prototypical_fields_feature.features.taxonomy.inc
+ * prototypical_fields_feature.features.taxonomy.inc
  */
 
 /**
  * Implements hook_taxonomy_default_vocabularies().
  */
-function chop_prototypical_fields_feature_taxonomy_default_vocabularies() {
+function prototypical_fields_feature_taxonomy_default_vocabularies() {
   return array(
     'testvocab' => array(
       'name' => 'testvocab',

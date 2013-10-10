@@ -1,4 +1,4 @@
-name = chop_prototypical_fields_feature
+name = prototypical_fields_feature
 description = One field per field type. These fields can be copied by a custom function.
 core = 7.x
 package = Features

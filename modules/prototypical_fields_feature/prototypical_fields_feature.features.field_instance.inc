@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * chop_prototypical_fields_feature.features.field_instance.inc
+ * prototypical_fields_feature.features.field_instance.inc
  */
 
 /**
  * Implements hook_field_default_field_instances().
  */
-function chop_prototypical_fields_feature_field_default_field_instances() {
+function prototypical_fields_feature_field_default_field_instances() {
   $field_instances = array();
 
   // Exported field_instance: 'node-proto-field_address_proto'

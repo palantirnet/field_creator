@@ -9,21 +9,21 @@
 /**
  * Implements hook_init().
  */
-function chop_field_creator_init() {
+function field_creator_init() {
 
-  module_load_include('install', 'chop_field_creator');
-  // chop_field_creator_create_field_bases();
-  // chop_field_creator_create_field_instances();
+  module_load_include('install', 'field_creator');
+  // field_creator_create_field_bases();
+  // field_creator_create_field_instances();
   // @todo
-  // hook_chop_field_creator_suggested_field_base_name_alter()
-  // hook_chop_field_creator_suggested_field_base_config_alter()
-  // hook_chop_field_creator_suggested_field_instance_config_alter()
-  // hook_chop_field_creator_suggested_field_base_name_alter()
+  // hook_field_creator_suggested_field_base_name_alter()
+  // hook_field_creator_suggested_field_base_config_alter()
+  // hook_field_creator_suggested_field_instance_config_alter()
+  // hook_field_creator_suggested_field_base_name_alter()
 }
 /**
- * Implements hook_chop_field_creator_desired_field_config_alter().
+ * Implements hook_field_creator_desired_field_config_alter().
  */
-function chop_field_creator_chop_field_creator_desired_field_config_alter(&$field_config, $field_csv_settings) {
+function field_creator_field_creator_desired_field_config_alter(&$field_config, $field_csv_settings) {
 
   // @todo, improve the csv handling so that this code doesn't need to rely on
   // numeric keys.;
@@ -46,7 +46,7 @@ function chop_field_creator_chop_field_creator_desired_field_config_alter(&$fiel
   if (strpos($field_name, 'field_ref_') === 0) {
     // debug($field_csv_settings);
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
-      // Most of the CHOP reference fields can point at only one field type.
+      // Most of the reference fields can point at only one field type.
       // @todo, move to a csv.
       $target_bundle_by_field = array(
         'field_ref_org_entities' => 'org_entity',
@@ -76,8 +76,8 @@ function chop_field_creator_chop_field_creator_desired_field_config_alter(&$fiel
   elseif (strpos($field_name, 'field_refterm_') === 0) {
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // @todo, this section of code could be moved to a helper function.
-      $base_fields_csv_path = drupal_get_path('module', 'chop_field_creator') . '/csv/chop-build-spec-fields-vocab-mapping.csv';
-      $vocab_machine_names_by_field_machine_name = chop_field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
+      $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
+      $vocab_machine_names_by_field_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
       if (!empty($vocab_machine_names_by_field_machine_name[$field_name])) {
         $single_target_bundle = $vocab_machine_names_by_field_machine_name[$field_name];
       }

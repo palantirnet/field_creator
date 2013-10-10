@@ -12,10 +12,10 @@
  *
  * @see drush_parse_command()
  */
-function chop_field_creator_drush_command() {
+function field_creator_drush_command() {
   $items = array();
 
-  $items['chop-field-creator-export-content-types'] = array(
+  $items['field-creator-export-content-types'] = array(
     'description' => "",
     'arguments' => array(
       'base_fields_feature' => 'The machine name of the features module that contains base fields.',
@@ -26,7 +26,7 @@ function chop_field_creator_drush_command() {
       'version-set' => "Specify a version number for the feature.",
       'version-increment' => "Increment the feature's version number.",
     ),
-    'drupal dependencies' => array('features', 'chop_field_creator'),
+    'drupal dependencies' => array('features', 'field_creator'),
     // 'aliases' => array('fe'),
   );
 
@@ -36,9 +36,9 @@ function chop_field_creator_drush_command() {
 /**
  * Implements hook_drush_help().
  */
-function chop_field_creator_drush_help($section) {
+function field_creator_drush_help($section) {
   switch ($section) {
-    case 'drush:chop-field-creator-export-content-types':
+    case 'drush:field-creator-export-content-types':
       return dt("Export content type features");
   }
 }
@@ -47,7 +47,7 @@ function chop_field_creator_drush_help($section) {
 /**
  * Exports node types that haven't been exported yet.
  */
-function drush_chop_field_creator_export_content_types() {
+function field_creator_export_content_types() {
   if ($args = func_get_args()) {
     list($field_bases_feature, $module_prefix) = $args;
     drush_print(dt('Making modules with the prefix !module_prefix that depend on the feature !fields_bases_feature', array('!module_prefix' => $module_prefix, '!fields_bases_feature' => $field_bases_feature)));
@@ -58,7 +58,7 @@ function drush_chop_field_creator_export_content_types() {
       $content_type_feature_module_name = $module_prefix . $type_machine_name;
 
       // If the node type hasn't been exported already, export it.
-      if (!chop_field_creator_has_node_type_been_exported($type_machine_name)) {
+      if (!field_creator_has_node_type_been_exported($type_machine_name)) {
         drush_features_export($content_type_feature_module_name, 'node:' . $type_machine_name, 'dependencies:' . $field_bases_feature);
       }
       else {
@@ -74,7 +74,7 @@ function drush_chop_field_creator_export_content_types() {
  * 
  * @todo, There might be a function in features that does this same task.
  */
-function chop_field_creator_has_node_type_been_exported($node_type) {
+function field_creator_has_node_type_been_exported($node_type) {
 
   $components = _drush_features_component_list();
   $args_for_filter = array('node');

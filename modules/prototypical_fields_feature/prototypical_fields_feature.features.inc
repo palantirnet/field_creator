@@ -1,13 +1,13 @@
 <?php
 /**
  * @file
- * chop_prototypical_fields_feature.features.inc
+ * prototypical_fields_feature.features.inc
  */
 
 /**
  * Implements hook_node_info().
  */
-function chop_prototypical_fields_feature_node_info() {
+function prototypical_fields_feature_node_info() {
   $items = array(
     'proto' => array(
       'name' => t('Prototypical Content Type'),
