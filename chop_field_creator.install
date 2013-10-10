@@ -1,0 +1,556 @@
+<?php
+/**
+ * @file
+ * Drupal needs this blank file.
+ *
+ * @copyright (C) Copyright 2013 Palantir.net, Inc.
+ */
+
+/**
+ * Implements hook_enable().
+ */
+function chop_field_creator_enable() {
+  chop_field_creator_add_node_types();
+  chop_field_creator_add_vocabularies();
+  chop_field_creator_create_field_bases();
+  chop_field_creator_create_field_instances();
+  variable_set('menu_rebuild_needed', TRUE);
+}
+
+
+/**
+ * Return an array of desired node types.
+ *
+ * @return array
+ *   The return array has type machine names as keys and standard class objects
+ *   as values. The objects are should be in the format that node_type_save()
+ *   expects.
+ * @todo, This function should be pulling it's data from a csv.
+ */
+function chop_field_get_desired_node_types() {
+
+  $types = array(
+    'org_entity' => 'Organizational Entity',
+    'service' => 'Service',
+    'treatment' => 'Treatment',
+    'patient_story' => 'Patient Story',
+    'visitor_resource' => 'Visitor Resource',
+    'clinical_pathway' => 'Clinical Pathway',
+    'general_page' => 'General Page',
+    'health_resource' => 'Health Resource',
+    'location' => 'Location',
+    'testimonial' => 'Testimonial',
+    'location_alerts' => 'Location Alert',
+    'news' => 'News',
+    'product' => 'Product',
+    'event' => 'Event',
+    'pfe' => 'PFE',
+    'condition' => 'Condition',
+    'person' => 'Person',
+    'video' => 'Video',
+    'slideshow' => 'Slide show',
+  );
+
+  foreach($types as $node_type_machine_name => $label) {
+    $type_info = new stdClass;
+    $type_info->type = $node_type_machine_name;
+    $type_info->name = $label;
+    $type_info->base = 'node_content';
+    $type_info->module = 'node';
+    // Even though this type is is getting added by this module, tell the node
+    // system that this type is user added so that it can be later exported
+    // to it's own feature.
+    $type_info->custom = TRUE;
+    $type_info->locked = FALSE;
+
+    $types[$node_type_machine_name] = $type_info;
+  }
+
+  return $types;
+}
+
+/**
+ * Add all expected node types to the database.
+ */
+function chop_field_creator_add_node_types() {
+
+  $types = chop_field_get_desired_node_types();
+
+  foreach ($types as $type_machine_name => $type_info) {
+    // If the node type doesn't exist yet, create it.
+    if (!node_type_load($type_machine_name)) {
+      node_type_save($type_info);
+    }
+    else {
+      // @todo, some reporting for exisitng content types. This isn't
+      // necessarily an error.
+    }
+  }
+}
+
+/**
+ * Load vocab data from a CSV and save any vocabularies that don't exist yet.
+ *
+ * @todo, currently this function pulls only machine names and labels. It does
+ * not include descriptions which we may want to add.
+ */
+function chop_field_creator_add_vocabularies() {
+  // This csv is the google spreadsheet (url on two lines)
+  // https://docs.google.com/a/palantir.net/spreadsheet/ccc
+  // ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=19
+  // @todo, this csv functionality should be moved out to a helper function.
+  // Probably chop_field_creator_get_desired_taxonomy_vocabularies()
+  $base_fields_csv_path = drupal_get_path('module', 'chop_field_creator') . '/csv/chop-build-spec-fields-vocab-mapping.csv';
+  $vocab_titles_by_machine_name = chop_field_creator_getMappingFromCSV($base_fields_csv_path, 2, 3);
+  // Chop off the top row which only labels the the columns.
+  array_shift($vocab_titles_by_machine_name);
+
+  // Insert vocabularies for every machine name that doesn't exist yet.
+  foreach ($vocab_titles_by_machine_name as $machine_name => $label) {
+    if (FALSE === taxonomy_vocabulary_machine_name_load($machine_name)) {
+      $new_vocab = new stdClass();
+      $new_vocab->machine_name = $machine_name;
+      $new_vocab->name = $label;
+      taxonomy_vocabulary_save($new_vocab);
+    }
+  }
+}
+
+/**
+ * Create field bases.
+ */
+function chop_field_creator_create_field_bases() {
+  // Load all the existing field bases up-front so that we don't
+  // have to rebuild the cache all the time.
+  field_info_cache_clear();
+  $existing_fields = field_info_fields();
+  // Get all the desired fields.
+  $desired_fields = chop_field_creators_get_desired_fields();
+
+  // Loop over the desired fields and create them.
+  foreach ($desired_fields as $field_name => $field) {
+    // Create the field if it doesn't exist yet.
+    if (empty($existing_fields[$field_name])) {
+      field_create_field($field);
+    }
+  }
+  return 'Created base fields';
+}
+
+/**
+ * Create field instances.
+ */
+function chop_field_creator_create_field_instances() {
+
+  field_info_cache_clear();
+  $desired_field_instances = chop_field_creators_get_desired_field_instances();
+  foreach ($desired_field_instances as $field_instance_name => $field_instance) {
+    // If the field base information does not exist yet, cancel out.
+    if (!field_info_field($field_instance['field_name'])) {
+      continue;
+    }
+    // $field_instance name should look like
+    // "node-org_entity-field_text_title_short".
+    list($entity, $bundle, $field_name) = explode('-', $field_instance_name);
+    // Make sure the field instance does not exist yet.
+    if (field_info_instance($entity, $field_name, $bundle) === NULL) {
+      field_create_instance($field_instance);
+    }
+  }
+}
+
+/**
+ * Combine prototypical fields from Features and a csv.
+ *
+ * Return a large array of field definitions like one that might be a a Features
+ * module.
+ */
+function chop_field_creators_get_desired_fields() {
+
+  // The variable to be returned at by this function.
+  $desired_fields = array();
+
+  // Get all the fields from the CSV.
+  $fields_from_csv = chop_field_creator_get_fields_from_csv();
+  foreach ($fields_from_csv as $field_name => $field_csv_settings) {
+    // This function might return an empty array.
+    if ($desired_field_config = chop_field_creator_get_desired_field_config($field_name, $field_csv_settings)) {
+      $desired_fields[$field_name] = $desired_field_config;
+    }
+    else {
+      // @todo, error handling for empty arrays.
+    }
+  }
+
+  return $desired_fields;
+}
+
+/**
+ * Take a single field name and it's csv settings and return a field config.
+ */
+function chop_field_creator_get_desired_field_config($field_name, $field_csv_settings) {
+  // The array to be returned,
+  $field_config = array();
+  $prototypical_field_names_by_type = chop_fields_creator_get_prototypical_field_names_by_type();
+  $prototypical_fields = chop_field_creator_get_prototypical_field_bases();
+
+  // The 2 key is the field type.
+  // @todo adapt $field_csv_settings to use string keys instead of numeric so
+  // that the key can be 'field type'
+  // Make sure that the field type of this field has a prototypical definition.
+  if ($proto_field_name = chop_field_creator_get_prototypical_field_base_name($field_name, $field_csv_settings[2])) {
+
+    $field_config = $prototypical_fields[$proto_field_name];
+    // Overwrite the field_name from the prototype array.
+    $field_config['field_name'] = $field_name;
+  }
+
+  drupal_alter('chop_field_creator_desired_field_config', $field_config, $field_csv_settings);
+  // @todo, Add an alter hook to api.php
+  // hook_chop_field_creator_desired_field_config_alter(&$field_config,
+  // $field_name);
+  return $field_config;
+}
+
+/**
+ * Get and array of field config that can be copied to other fields.
+ *
+ * The returned array should contain same definitions for text_long, text and
+ * other common field types that can be copied to other machine names. For field
+ * types with many settings (like entityreference) there may be more than one
+ * proto config.
+ */
+function chop_field_creator_get_prototypical_field_bases() {
+  // @todo, add static caching
+  module_load_include('inc', 'features', 'features.export');
+  if ($prototypical_fields = features_get_default('field_base', 'chop_prototypical_fields_feature')) {
+    // @todo add hook_prototypical_field_bases_alter()
+    return $prototypical_fields;
+  }
+  return array();
+}
+
+/**
+ * Gets prototypical field instances from a Feature.
+ */
+function chop_field_creator_get_prototypical_field_instances() {
+  // @todo, add static caching.
+  module_load_include('inc', 'features', 'features.export');
+  if ($prototypical_field_instances = features_get_default('field_instance', 'chop_prototypical_fields_feature')) {
+    // @todo add hook_prototypical_field_instances_alter()
+    return $prototypical_field_instances;
+  }
+  return array();
+}
+
+/**
+ * Combine prototypical field instances from Features and a csv.
+ *
+ * The return is a large array of instance to be imported from hook_enable.
+ */
+function chop_field_creators_get_desired_field_instances() {
+
+  $prototypical_field_instances = chop_field_creator_get_prototypical_field_instances();
+  $desired_instances = array();
+  $intersections = chop_field_creator_get_field_bundle_intersection_by_field();
+  $fields_from_csv = chop_field_creator_get_fields_from_csv();
+
+  foreach ($intersections as $field_name => $entity_types_and_bundles) {
+    // 2 just happens to be the csv column that has the field type.
+    // 0 is the most common field label.
+    if (!empty($fields_from_csv[$field_name][2]) && !empty($fields_from_csv[$field_name][0])) {
+      $field_type = $fields_from_csv[$field_name][2];
+      $field_label = $fields_from_csv[$field_name][0];
+      // Make sure that this field has a prototypical type. At first this module
+      // is only supporting simple types like text and text_long. Not
+      // entityreference.
+      if ($prototypical_field_instance_name = chop_field_creator_get_prototypical_field_instance_name($field_name, $field_type)) {
+
+        $prototypical_field_instance = $prototypical_field_instances[$prototypical_field_instance_name];
+        foreach ($entity_types_and_bundles as $entity_type_and_bundle) {
+          // This string should look like "node - treatment"
+          $entity_type_and_bundle_array = explode(' - ', $entity_type_and_bundle);
+          if (count($entity_type_and_bundle_array) === 2) {
+            list($entity_type, $bundle) = $entity_type_and_bundle_array;
+            if ($desired_instance = chop_field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label)) {
+              $desired_instances[$entity_type . "-" . $bundle . "-" . $field_name] = $desired_instance;
+            }
+          }
+        }
+      }
+    }
+  }
+  return $desired_instances;
+}
+
+/**
+ * Get the name of the prototypical field base for another field name.
+ */
+function chop_field_creator_get_prototypical_field_base_name($field_name, $field_type) {
+  $return_field_name = '';
+  $prototypical_field_names_by_type = chop_fields_creator_get_prototypical_field_names_by_type();
+  $proto_field_bases = chop_field_creator_get_prototypical_field_bases();
+
+  // Check for a direct name match.
+  foreach ($proto_field_bases as $proto_field_name => $proto_config) {
+    // If the incoming field has an exact match in the proto instances, just
+    // take it.
+    if ($proto_field_name === $field_name) {
+      $return_field_name = $proto_field_name;
+      break;
+    }
+  }
+
+  // If there was not a direct name match, proceed to other ways of finding
+  // a base field.
+  if (empty($return_field_name)) {
+    // Check by field type.
+    if (!empty($prototypical_field_names_by_type[$field_type])) {
+      $return_field_name = $prototypical_field_names_by_type[$field_type];
+    }
+    else {
+      // @todo, remove hard code a fix for field_ref_ and field_refterm_
+      // Split these two patterns because they have different target entity
+      // types.
+      if (strpos($field_name, 'field_refterm_') === 0) {
+        $return_field_name = 'field_refterm_proto';
+      }
+      elseif (strpos($field_name, 'field_ref_') === 0) {
+        $return_field_name = 'field_ref_proto';
+      }
+    }
+  }
+
+  // @todo, This kind of specific change should happen in an alter hook.
+  // Set video fields to use field_file_video_proto
+  // (instead of field_file_proto) because there are setting specific to video
+  // files.
+  if (strpos($field_name, 'field_file_vid') === 0) {
+    $return_field_name = 'field_file_video_proto';
+  }
+
+  return $return_field_name;
+}
+
+/**
+ * Return just the name of the the prototypical instance that should be copied.
+ *
+ * @todo, add an alter hook and more parameters for that alter to use.
+ */
+function chop_field_creator_get_prototypical_field_instance_name($field_name, $field_type) {
+  $return_field_instance_name = '';
+  // @todo, this variable is no longer being used after a refactor,
+  // but it probably should be.
+  $prototypical_field_instances_by_type = chop_fields_creator_get_prototypical_field_instances_by_type();
+
+  $proto_instances = chop_field_creator_get_prototypical_field_instances();
+  $proto_field_base_name = chop_field_creator_get_prototypical_field_base_name($field_name, $field_type);
+  foreach ($proto_instances as $proto_instance_name => $proto_instance) {
+    list($proto_instance_entity, $proto_instance_bundle, $proto_instance_field_name) = explode('-', $proto_instance_name);
+    if ($proto_field_base_name === $proto_instance_field_name) {
+      $return_field_instance_name = $proto_instance_name;
+    }
+  }
+  return $return_field_instance_name;
+}
+
+/**
+ * Create an array like the one from Features for all desired field instances.
+ *
+ * Combine real field instance information with a list of instances that should
+ * exist.
+ */
+function chop_field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label) {
+
+  $field_instance = $prototypical_field_instance;
+
+  // @todo, Add handling for these options.
+  $default_value = NULL;
+  $required = 0;
+  $help_text = '';
+
+  $field_instance['bundle'] = $bundle;
+  $field_instance['default_value'] = $default_value;
+  $field_instance['description'] = $help_text;
+  $field_instance['entity_type'] = $entity_type;
+  $field_instance['field_name'] = $field_name;
+  $field_instance['label'] = $field_label;
+  $field_instance['required'] = $required;
+
+  return $field_instance;
+}
+
+/**
+ * Gets base field information from a CSV file.
+ *
+ * This csv is the google spreadsheet (url on two lines)
+ * https://docs.google.com/a/palantir.net/spreadsheet/ccc
+ * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=1
+ */
+function chop_field_creator_get_fields_from_csv() {
+  $base_fields_csv_path = drupal_get_path('module', 'chop_field_creator') . '/csv/chop_build_spec_-_fields.csv';
+  return chop_field_creator_getMappingFromCSV($base_fields_csv_path, 1);
+}
+
+/**
+ * Gets field instance information from a CSV file.
+ *
+ * This csv is the google spreadsheet (url on two lines)
+ * https://docs.google.com/a/palantir.net/spreadsheet/ccc
+ * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=18
+ */
+function chop_field_creator_get_field_instances_from_csv() {
+  $base_fields_csv_path = drupal_get_path('module', 'chop_field_creator') . '/csv/chop_build_spec_-_fields_bundles_intersections.csv';
+  return chop_field_creator_getMappingFromCSV($base_fields_csv_path, 1);
+}
+/**
+ * Gets field instance information from a CSV file and transform into an array.
+ *
+ * The array will look this this one:
+ *
+ * Array(
+ *   [field_text_title_short] => Array(
+ *     [0] => node - org_entity
+ *     [1] => node - service
+ *     [2] => node - treatment
+ *     [3] => node - patient_story
+ *     [4] => node - visitor_resource
+ *     [5] => node - clinical_pathway
+ *     [6] => node - general_page
+ *     [7] => node - health_resource
+ *     [8] => node - location
+ *     [9] => node - testimonal
+ *     [10] => node - location_alerts
+ *     [11] => node - news
+ *     [12] => node - product
+ *     [13] => node - event
+ *     [14] => node - pfe
+ *     [15] => node - condition
+ *     [16] => node - video
+ *     [17] => node - slideshow
+ *     [18] => file - document
+ *   )
+ *   [field_text_body] => Array(
+ *     [0] => node - org_entity
+ *     [1] => node - service
+ *     [2] => node - treatment
+ *     [3] => node - patient_story
+ *     [4] => node - visitor_resource
+ *     [5] => node - clinical_pathway
+ *     [6] => node - general_page
+ *     [7] => node - health_resource
+ *     [8] => node - location
+ *     [9] => node - testimonal
+ *     [10] => node - location_alerts
+ *     [11] => node - product
+ *     [12] => node - event
+ *     [13] => node - pfe
+ *     [14] => node - condition
+ *     [15] => node - video
+ *   )
+ * )
+ */
+function chop_field_creator_get_field_bundle_intersection_by_field() {
+  $desired_field_instances = chop_field_creator_get_field_instances_from_csv();
+  $bundle_names = array_shift($desired_field_instances);
+
+  $intersections_by_field = array();
+  foreach ($desired_field_instances as $field_name => $csv_array) {
+    foreach ($csv_array as $numeric_key => $possible_x) {
+      // The spreadsheet should have x's but might have a capital X.
+      if ($possible_x === 'x' || $possible_x === 'X') {
+        $intersections_by_field[$field_name][] = $bundle_names[$numeric_key];
+      }
+    }
+  }
+  ksort($intersections_by_field);
+  return $intersections_by_field;
+}
+
+/**
+ * Return a list of prototypical fields keyed by their field type.
+ */
+function chop_fields_creator_get_prototypical_field_names_by_type() {
+  return array(
+    'text_long' => 'field_text_long_proto',
+    'text' => 'field_text_proto',
+    'addressfield' => 'field_address_proto',
+    'datetime' => 'field_date_proto',
+    'email' => 'field_email_proto',
+    'link_field' => 'field_links_proto',
+    'number_integer' => 'field_int_proto',
+    'list_boolean' => 'field_boolean_proto',
+    'file' => 'field_files_proto',
+    'image' => 'field_image_proto',
+    'name' => 'field_name_proto',
+  );
+}
+
+/**
+ * Return a list of prototypical fields keyed by their field type.
+ */
+function chop_fields_creator_get_prototypical_field_instances_by_type() {
+  return array(
+    'text_long' => 'node-proto-field_text_long_proto',
+    'text' => 'node-proto-field_text_proto',
+    'addressfield' => 'node-proto-field_address_proto',
+    'datetime' => 'node-proto-field_date_proto',
+    'email' => 'node-proto-field_email_proto',
+    'link_field' => 'node-proto-field_links_proto',
+    'number_integer' => 'node-proto-field_int_proto',
+    'list_boolean' => 'node-proto-field_boolean_proto',
+    'file' => 'node-proto-field_files_proto',
+    'image' => 'node-proto-field_image_proto',
+    'name' => 'node-proto-field_name_proto',
+  );
+}
+
+/**
+ * Get an array that has categories as keys and country entries as values.
+ */
+function chop_field_creator_getMappingFromCSV($path, $key_column = NULL, $desired_value_position = FALSE) {
+  $csv_array = chop_field_creator_csvToArray($path);
+  return chop_field_creator_csvArrayMappingGenerator($csv_array, $key_column, $desired_value_position);
+}
+
+/**
+ * Transform an array from a csv to be keyed by one of it's columns.
+ */
+function chop_field_creator_csvArrayMappingGenerator($csv_array, $source_value_position = 0, $desired_value_position = FALSE) {
+  $mapping = array();
+
+  foreach ($csv_array as $row) {
+    if (!empty($row[$source_value_position])) {
+      // @todo, should this be a separate param?
+      if ($desired_value_position === FALSE) {
+        $value = $row;
+      }
+      else {
+        // Some csv values have trailing whitespace, so they get trimmed.
+        // @todo, are there any values for which trim() is not appropriate?
+        $value = trim($row[$desired_value_position]);
+      }
+
+      $mapping[trim($row[$source_value_position])] = $value;
+    }
+  }
+  return $mapping;
+}
+
+/**
+ * Turns a csv file into an array.
+ */
+function chop_field_creator_csvToArray($file_path) {
+
+  $arrays = &drupal_static(__METHOD__);
+  if (!isset($arrays[$file_path])) {
+    if (($handle = fopen($file_path, "r")) !== FALSE) {
+      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $arrays[$file_path][] = $data;
+      }
+      fclose($handle);
+    }
+  }
+
+  return $arrays[$file_path];
+}

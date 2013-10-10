@@ -1,0 +1,329 @@
+<?php
+
+/**
+ * @file
+ * Tests of chop_field_creator module.
+ *
+ * @copyright (C) Copyright 2013 Palantir.net, Inc.
+ */
+
+/**
+ * Tests of chop_field_creator module.
+ *
+ * This class runs on the real data base. See
+ * http://lucor.github.com/
+ * 2012/04/drupal-speed-up-simpletest-tests-usign-live-database
+ */
+abstract class ChopFieldCreatorTestCase extends DrupalWebTestCase {
+
+  // If this test runs as a full build it needs to install a profile.
+  // @todo, maybe it doesn't. The dependencies in chop_field_creator might
+  // be sufficient.
+  protected $profile = 'palantirprofile';
+
+  public $errors = array();
+
+  /**
+   * Override the normal set and just set setup to TRUE.
+   *
+   * By default SimpleTest will create a sandbox database and run all the tests
+   * in there. This override to the setUp function ensures that we use the real
+   * database instead where the migrated data is accessible.
+   */
+  public function setUp($modules = array()) {
+    // $modules = array_merge($modules, array('chop_field_creator', 'devel'));
+    // parent::setUp($modules);
+    $this->setup = TRUE;
+  }
+
+  /**
+   * Overrides the tearDown method so that the database tables are NOT removed.
+   *
+   * We are using the real database so we need to be VERY careful to leave it as
+   * we found it.
+   */
+  public function tearDown() {
+    // parent::tearDown();
+  }
+
+  /**
+   * Check for the presence of a field instance.
+   */
+  public function assertFieldInstance($entity_type, $field_name, $bundle, $message = '') {
+    if (empty($message)) {
+      $replacements = array(
+        '@entity_type' => $entity_type,
+        '@bundle' => $bundle,
+        '@field_name' => $field_name,
+      );
+      $message = t('There is an instance of @field_name on the @bundle bundle of the entity type @entity_type', $replacements);
+    }
+    $instance = field_info_instance($entity_type, $field_name, $bundle);
+    return $this->assertNotNull($instance, $message);
+  }
+}
+
+/**
+ * @todo document
+ */
+class ChopFieldCreatorTests extends ChopFieldCreatorTestCase {
+
+  /**
+   * Basic test information.
+   */
+  static public function getInfo() {
+    return array(
+      'name' => 'Test chop_field_creators',
+      'description' => 'Test field instances and base definitions.',
+      'group' => 'CHOP',
+    );
+  }
+
+  /**
+   * Test that all that defined instances were actually created.
+   *
+   * Check chop_field_creators_get_desired_field_instances() against what fields
+   * actually exist.
+   *
+   * It's possible that chop_field_creators_get_desired_field_instances()
+   * returns more instances than are actually present. This test detects failed
+   * instance creation.
+   */
+  public function testGetDesiredFieldInstancesAgainstCreation() {
+    // Bring in the install file where this function lives.
+    module_load_include('install', 'chop_field_creator');
+    $desired_instance = chop_field_creators_get_desired_field_instances();
+    foreach ($desired_instance as $machine_name => $instance) {
+      // debug($machine_name);
+      list($entity_type, $bundle, $field_name) = explode('-', $machine_name);
+      $this->assertFieldInstance($entity_type, $field_name, $bundle);
+    }
+  }
+
+  /**
+   * Check the field instance spreadsheet against actual field instances.
+   */
+  public function testFieldInstanceCreation() {
+
+    // Bring in the install file where this function lives.
+    module_load_include('install', 'chop_field_creator');
+    $intersections = chop_field_creator_get_field_bundle_intersection_by_field();
+
+    foreach ($intersections as $field_name => $entity_types_and_bundles) {
+      // Loop over all intersections and check whether the instance exists or
+      // not.
+      if (strpos($field_name, 'field_') === 0) {
+        foreach ($entity_types_and_bundles as $entity_type_and_bundle) {
+          list($entity_type, $bundle) = explode(' - ', $entity_type_and_bundle);
+          $this->assertFieldInstance($entity_type, $field_name, $bundle);
+        }
+      }
+    }
+  }
+
+  /**
+   * Test that an field has the expected number of allowed values.
+   *
+   * Move this test to a different class or its own class.
+   */
+  public function testCardindality() {
+
+    $desired_instances = chop_field_creators_get_desired_fields();
+    $config = $desired_instances['field_ref_locations'];
+    $this->assertIdentical($config['cardinality'], '-1', 'field_ref_locations has a cardinality of "-1"');
+
+    // @todo uncomment this test.
+    // $this->assert(FALSE, 'There is no test of going from unlimited to one');
+  }
+
+  /**
+   * Test the allowed values of an entity reference field.
+   *
+   * Move this test to a different class or its own class.
+   */
+  public function testEntityReferenceAllowedValues() {
+
+    $desired_instances = chop_field_creators_get_desired_fields();
+
+    $settings = $desired_instances['field_ref_locations']['settings'];
+    $handler_settings = $settings['handler_settings'];
+    $target_bundles = $handler_settings['target_bundles'];
+    $this->assertIdentical($settings['handler'], 'base');
+    // There should be only one target bundle.
+    $this->assertIdentical(count($target_bundles), 1);
+    $this->assertIdentical($target_bundles['location'], 'location');
+
+    $settings = $desired_instances['field_refterm_event_type']['settings'];
+    $handler_settings = $settings['handler_settings'];
+    $target_bundles = $handler_settings['target_bundles'];
+    $this->assertIdentical($settings['handler'], 'base');
+    // There should be only one target bundle.
+    $this->assertIdentical(count($target_bundles), 1);
+    $this->assertIdentical($target_bundles['event_type'], 'event_type');
+    $this->assertIdentical($settings['target_type'], 'taxonomy_term');
+  }
+
+  /**
+   * Check that all fields in the csv have a type.
+   */
+  public function testCsvHasTypes() {
+    $fields_from_csv = chop_field_creator_get_fields_from_csv();
+    foreach ($fields_from_csv as $field_name => $field_csv_settings) {
+      if (strpos($field_name, 'field_') === 0) {
+        $this->assertTrue(!empty($field_csv_settings[0]), t('@field_name has a label', array('@field_name' => $field_name)));
+        $this->assertTrue(!empty($field_csv_settings[2]), t('@field_name has a type', array('@field_name' => $field_name)));
+      }
+    }
+  }
+
+  /**
+   * Ensure that derived field config matches csv.
+   */
+  public function testOfFieldTypes() {
+
+    $fields_from_csv = chop_field_creator_get_fields_from_csv();
+    $derived_field_config = chop_field_creators_get_desired_fields();
+    foreach ($fields_from_csv as $field_machine_name => $csv_info) {
+      if (strpos($field_machine_name, 'field_') === 0) {
+        $type_from_csv = $csv_info[2];
+        $derived_type = $derived_field_config[$field_machine_name]['type'];
+        $repacements = array(
+          '@type_from_csv' => $type_from_csv,
+          '@derived_type' => $derived_type,
+          '@field_name' => $field_machine_name,
+        );
+
+        $message = t('The field @field_name has the field type @type_from_csv defined in the csv and @derived_type is the derived type', $repacements);
+        $this->assertIdentical($type_from_csv, $derived_type, $message);
+      }
+    }
+  }
+
+  /**
+   * Unit tests of chop_field_creator_get_prototypical_field_base_name().
+   */
+  public function testUnitTestNamestoProtoNames() {
+    $this->assertProtoFieldName('field_files', 'file', 'field_files_proto');
+    $this->assertProtoFieldName('field_boolean', 'list_boolean', 'field_boolean_proto');
+    $this->assertProtoFieldName('field_refterm_event_type', 'entityreference', 'field_refterm_proto');
+    $this->assertProtoFieldName('field_ref_locations', 'entityreference', 'field_ref_proto');
+    $this->assertProtoFieldName('field_text_subtitle', 'text', 'field_text_proto');
+    $this->assertProtoFieldName('field_text_body', 'text_long', 'field_text_long_proto');
+    $this->assertProtoFieldName('field_email', 'email', 'field_email_proto');
+    $this->assertProtoFieldName('field_file_video', 'file', 'field_file_video_proto');
+  }
+
+  /**
+   * Unit tests of chop_field_creator_get_prototypical_field_instance_name().
+   */
+  public function testUnitTestInstanceNamesToProtoNames() {
+
+    $this->assertProtoInstanceName('field_boolean_spanish', 'list_boolean', 'node-proto-field_boolean_proto');
+    $this->assertProtoInstanceName('field_refterm_event_type', 'entityreference', 'node-proto-field_refterm_proto');
+
+    // node-proto-field_text_proto
+    $this->assertProtoInstanceName('field_text_subtitle', 'text', 'node-proto-field_text_proto');
+    $this->assertProtoInstanceName('field_email', 'email', 'node-proto-field_email_proto');
+    $this->assertProtoInstanceName('field_file_video', 'file', 'node-proto-field_file_video_proto');
+    $this->assertProtoInstanceName('field_text_body', 'text_long', 'node-proto-field_text_long_proto');
+  }
+
+  /**
+   * Check the field instance spreadsheet against actual field instances.
+   */
+  public function testComparison() {
+
+    // Bring in the install file where this function lives.
+    module_load_include('install', 'chop_field_creator');
+    $intersections = chop_field_creator_get_field_bundle_intersection_by_field();
+    $desired_instances = chop_field_creators_get_desired_field_instances();
+    $desired_instance_names = array_keys($desired_instances);
+
+    $flat_intersections = array();
+    foreach ($intersections as $field_name => $entity_types_and_bundles) {
+      // Loop over all intersections and check whether the instance exists or
+      // not.
+      if (strpos($field_name, 'field_') === 0) {
+        foreach ($entity_types_and_bundles as $entity_type_and_bundle) {
+          list($entity_type, $bundle) = explode(' - ', $entity_type_and_bundle);
+          $concat = $entity_type . '-' . $bundle . '-' . $field_name;
+          $flat_intersections[$concat] = $concat;
+        }
+      }
+    }
+
+    $this->compareArrays($flat_intersections, 'flat_intersections', $desired_instance_names, 'desired_instance_names');
+    $this->compareArrays($desired_instance_names, 'desired_instance_names', $flat_intersections, 'flat_intersections');
+  }
+
+  /**
+   * Compare the values in two arrays.
+   *
+   * This method ensures that all values in the second array are present in the
+   * first array.
+   */
+  protected function compareArrays($array_a, $array_a_name, $array_b, $array_b_name) {
+    // An array for all $values that are in $flat_intersections and are not
+    // in $desired_instance_names
+    $not_in_a = array();
+    foreach ($array_b as $name) {
+      if (!in_array($name, $array_a)) {
+        $not_in_a[] = $name;
+      }
+    }
+    $count_of_not_in_a = count($not_in_a);
+
+    $replacements = array(
+      '@array_a_name' => $array_a_name,
+      '@array_b_name' => $array_b_name,
+    );
+    $message = t('There are 0 items in @array_b_name that are not in @array_a_name', $replacements);
+    $this->assertTrue($count_of_not_in_a === 0, $message);
+    if ($count_of_not_in_a > 0) {
+      $replacements['@count'] = $count_of_not_in_a;
+      $message = t('There are @count values in @array_b_name that are not in @array_a_name', $replacements);
+      debug($message);
+      foreach ($not_in_a as $name) {
+        debug($name);
+      }
+    }
+  }
+
+  /**
+   * Helper function for checking derived names.
+   */
+  public function assertProtoFieldName($field_name, $field_type, $expected_result) {
+
+    $result = chop_field_creator_get_prototypical_field_base_name($field_name, $field_type);
+    $replacements = array(
+      '@field_name' => $field_name,
+      '@field_type' => $field_type,
+      '@expected_result' => $expected_result,
+    );
+    $message = t('The correct proto field name, @expected_result, is returned for the field @field_name of type @field_type', $replacements);
+
+    $this->assertTrue($result === $expected_result, $message);
+    if ($result !== $expected_result) {
+      debug($result);
+    }
+  }
+
+  /**
+   * Helper function for checking derived instance names.
+   */
+  public function assertProtoInstanceName($field_name, $field_type, $expected_result) {
+
+    $result = chop_field_creator_get_prototypical_field_instance_name($field_name, $field_type);
+    $replacements = array(
+      '@field_name' => $field_name,
+      '@field_type' => $field_type,
+      '@expected_result' => $expected_result,
+    );
+    $message = t('The correct proto instance name, @expected_result, is returned for the field @field_name of type @field_type', $replacements);
+
+    $this->assertTrue($result === $expected_result, $message);
+    if ($result !== $expected_result) {
+      debug($result);
+    }
+  }
+}
