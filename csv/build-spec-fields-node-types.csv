@@ -1,0 +1,20 @@
+Node Type machine name,Node type label
+org_entity,Organizational Entity
+service,Service
+treatment,Treatment
+patient_story,Patient Story
+visitor_resource,Visitor Resource
+clinical_pathway,Clinical Pathway
+general_page,General Page
+health_resource,Health Resource
+location,Location
+testimonial,Testimonial
+location_alerts,Location Alert
+news,News
+product,Product
+event,Event
+pfe,PFE
+condition,Condition
+person,Person
+video,Video
+slideshow,Slide show

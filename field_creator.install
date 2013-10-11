@@ -29,27 +29,10 @@ function field_creator_enable() {
  */
 function field_get_desired_node_types() {
 
-  $types = array(
-    'org_entity' => 'Organizational Entity',
-    'service' => 'Service',
-    'treatment' => 'Treatment',
-    'patient_story' => 'Patient Story',
-    'visitor_resource' => 'Visitor Resource',
-    'clinical_pathway' => 'Clinical Pathway',
-    'general_page' => 'General Page',
-    'health_resource' => 'Health Resource',
-    'location' => 'Location',
-    'testimonial' => 'Testimonial',
-    'location_alerts' => 'Location Alert',
-    'news' => 'News',
-    'product' => 'Product',
-    'event' => 'Event',
-    'pfe' => 'PFE',
-    'condition' => 'Condition',
-    'person' => 'Person',
-    'video' => 'Video',
-    'slideshow' => 'Slide show',
-  );
+  $base_types_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-node-types.csv';
+  $types = field_creator_getMappingFromCSV($base_types_csv_path, 0, 1);
+  // Chop off the top row which only labels the the columns.
+  array_shift($types);
 
   foreach($types as $node_type_machine_name => $label) {
     $type_info = new stdClass;
@@ -236,7 +219,7 @@ function field_creator_get_prototypical_field_bases() {
 function field_creator_get_prototypical_field_instances() {
   // @todo, add static caching.
   module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_field_instances = features_get_default('field_instance', 'chop_prototypical_fields_feature')) {
+  if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
     // @todo add hook_prototypical_field_instances_alter()
     return $prototypical_field_instances;
   }
@@ -388,7 +371,7 @@ function field_creator_get_desired_field_instance($field_name, $prototypical_fie
  * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=1
  */
 function field_creator_get_fields_from_csv() {
-  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/chop_build_spec_-_fields.csv';
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build_spec_-_fields.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 1);
 }
 
@@ -400,7 +383,7 @@ function field_creator_get_fields_from_csv() {
  * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=18
  */
 function field_creator_get_field_instances_from_csv() {
-  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/chop_build_spec_-_fields_bundles_intersections.csv';
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build_spec_-_fields_bundles_intersections.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 1);
 }
 /**
@@ -450,8 +433,8 @@ function field_creator_get_field_instances_from_csv() {
  *   )
  * )
  */
-function chop_field_creator_get_field_bundle_intersection_by_field() {
-  $desired_field_instances = chop_field_creator_get_field_instances_from_csv();
+function field_creator_get_field_bundle_intersection_by_field() {
+  $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundle_names = array_shift($desired_field_instances);
 
   $intersections_by_field = array();
