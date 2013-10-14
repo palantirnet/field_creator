@@ -25,10 +25,10 @@ function field_creator_enable() {
  *   The return array has type machine names as keys and standard class objects
  *   as values. The objects are should be in the format that node_type_save()
  *   expects.
- * @todo, This function should be pulling it's data from a csv.
  */
 function field_get_desired_node_types() {
 
+  // Pull Node types in from CSV.
   $base_types_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-node-types.csv';
   $types = field_creator_getMappingFromCSV($base_types_csv_path, 0, 1);
   // Chop off the top row which only labels the the columns.
@@ -84,7 +84,7 @@ function field_creator_add_vocabularies() {
   // @todo, this csv functionality should be moved out to a helper function.
   // Probably field_creator_get_desired_taxonomy_vocabularies()
   $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
-  $vocab_titles_by_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 2, 3);
+  $vocab_titles_by_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
   // Chop off the top row which only labels the the columns.
   array_shift($vocab_titles_by_machine_name);
 
