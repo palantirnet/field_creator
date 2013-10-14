@@ -78,13 +78,8 @@ function field_creator_add_node_types() {
  * not include descriptions which we may want to add.
  */
 function field_creator_add_vocabularies() {
-  // This csv is the google spreadsheet (url on two lines)
-  // https://docs.google.com/a/palantir.net/spreadsheet/ccc
-  // ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=19
-  // @todo, this csv functionality should be moved out to a helper function.
-  // Probably field_creator_get_desired_taxonomy_vocabularies()
-  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
-  $vocab_titles_by_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
+  
+  $vocab_titles_by_machine_name = field_creator_get_desired_taxonomy_vocabularies();
   // Chop off the top row which only labels the the columns.
   array_shift($vocab_titles_by_machine_name);
 
@@ -386,6 +381,19 @@ function field_creator_get_field_instances_from_csv() {
   $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build_spec_-_fields_bundles_intersections.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 1);
 }
+
+/**
+ * Gets Vocabulary information from a CSV file.
+ *
+ * This csv is the google spreadsheet (url on two lines)
+ * https://docs.google.com/a/palantir.net/spreadsheet/ccc
+ * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=19
+ */
+function field_creator_get_desired_taxonomy_vocabularies() {
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
+  return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
+}
+
 /**
  * Gets field instance information from a CSV file and transform into an array.
  *
