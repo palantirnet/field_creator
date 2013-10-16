@@ -63,8 +63,7 @@ function field_creator_add_node_types() {
       node_type_save($type_info);
     }
     else {
-      // @todo, some reporting for exisitng content types. This isn't
-      // necessarily an error.
+      drupal_set_message('The node type $type_machine_name already exists', 'warning');
     }
   }
 }
@@ -236,6 +235,9 @@ function field_creators_get_desired_field_instances() {
     if (!empty($fields_from_csv[$field_name]['type']) && !empty($fields_from_csv[$field_name]['name'])) {
       $field_type = $fields_from_csv[$field_name]['type'];
       $field_label = $fields_from_csv[$field_name]['name'];
+      $field_default = $fields_from_csv[$field_name]['default'];
+      $field_required = $fields_from_csv[$field_name]['required'];
+      $field_help = $fields_from_csv[$field_name]['help_text'];
       // Make sure that this field has a prototypical type. At first this module
       // is only supporting simple types like text and text_long. Not
       // entityreference.
@@ -247,7 +249,7 @@ function field_creators_get_desired_field_instances() {
           $entity_type_and_bundle_array = explode(' - ', $entity_type_and_bundle);
           if (count($entity_type_and_bundle_array) === 2) {
             list($entity_type, $bundle) = $entity_type_and_bundle_array;
-            if ($desired_instance = field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label)) {
+            if ($desired_instance = field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label, $field_default, $field_required, $field_help)) {
               $desired_instances[$entity_type . "-" . $bundle . "-" . $field_name] = $desired_instance;
             }
           }
@@ -335,14 +337,16 @@ function field_creator_get_prototypical_field_instance_name($field_name, $field_
  * Combine real field instance information with a list of instances that should
  * exist.
  */
-function field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label) {
+function field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label, $default_value, $field_required, $help_text) {
 
   $field_instance = $prototypical_field_instance;
 
-  // @todo, Add handling for these options.
-  $default_value = NULL;
-  $required = 0;
-  $help_text = '';
+ if ($field_required == ('Y' || 'y')){
+    $required = 1;
+  }
+  else{
+    $required = 0;
+  }
 
   $field_instance['bundle'] = $bundle;
   $field_instance['default_value'] = $default_value;
