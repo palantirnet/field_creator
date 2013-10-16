@@ -27,8 +27,8 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
 
   // @todo, improve the csv handling so that this code doesn't need to rely on
   // numeric keys.;
-  $field_name = $field_csv_settings[1];
-  $cardinality = $field_csv_settings[4];
+  $field_name = $field_csv_settings['machine_name'];
+  $cardinality = $field_csv_settings['num_values'];
 
   if (!empty($cardinality)  && !empty($field_config['cardinality'])) {
     if ($cardinality === 'unlimited') {
