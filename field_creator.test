@@ -108,11 +108,13 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     // Bring in the install file where this function lives.
     module_load_include('install', 'field_creator');
     $intersections = field_creator_get_field_bundle_intersection_by_field();
-
+    debug($intersections);
     foreach ($intersections as $field_name => $entity_types_and_bundles) {
       // Loop over all intersections and check whether the instance exists or
       // not.
       if (strpos($field_name, 'field_') === 0) {
+        debug($field_name);
+        debug($entity_types_and_bundles);
         foreach ($entity_types_and_bundles as $entity_type_and_bundle) {
           list($entity_type, $bundle) = explode(' - ', $entity_type_and_bundle);
           $this->assertFieldInstance($entity_type, $field_name, $bundle);
@@ -170,8 +172,8 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     $fields_from_csv = field_creator_get_fields_from_csv();
     foreach ($fields_from_csv as $field_name => $field_csv_settings) {
       if (strpos($field_name, 'field_') === 0) {
-        $this->assertTrue(!empty($field_csv_settings[0]), t('@field_name has a label', array('@field_name' => $field_name)));
-        $this->assertTrue(!empty($field_csv_settings[2]), t('@field_name has a type', array('@field_name' => $field_name)));
+        $this->assertTrue(!empty($field_csv_settings['name']), t('@field_name has a label', array('@field_name' => $field_name)));
+        $this->assertTrue(!empty($field_csv_settings['type']), t('@field_name has a type', array('@field_name' => $field_name)));
       }
     }
   }
@@ -185,7 +187,7 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     $derived_field_config = field_creators_get_desired_fields();
     foreach ($fields_from_csv as $field_machine_name => $csv_info) {
       if (strpos($field_machine_name, 'field_') === 0) {
-        $type_from_csv = $csv_info[2];
+        $type_from_csv = $csv_info['type'];
         $derived_type = $derived_field_config[$field_machine_name]['type'];
         $repacements = array(
           '@type_from_csv' => $type_from_csv,

@@ -31,8 +31,6 @@ function field_get_desired_node_types() {
   // Pull Node types in from CSV.
   $base_types_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-node-types.csv';
   $types = field_creator_getMappingFromCSV($base_types_csv_path, 0, 1);
-  // Chop off the top row which only labels the the columns.
-  array_shift($types);
 
   foreach($types as $node_type_machine_name => $label) {
     $type_info = new stdClass;
@@ -65,8 +63,7 @@ function field_creator_add_node_types() {
       node_type_save($type_info);
     }
     else {
-      // @todo, some reporting for exisitng content types. This isn't
-      // necessarily an error.
+      drupal_set_message('The node type $type_machine_name already exists', 'warning');
     }
   }
 }
@@ -84,11 +81,12 @@ function field_creator_add_vocabularies() {
   array_shift($vocab_titles_by_machine_name);
 
   // Insert vocabularies for every machine name that doesn't exist yet.
-  foreach ($vocab_titles_by_machine_name as $machine_name => $label) {
-    if (FALSE === taxonomy_vocabulary_machine_name_load($machine_name)) {
+  foreach ($vocab_titles_by_machine_name as $vocab) {
+    if (FALSE === taxonomy_vocabulary_machine_name_load($vocab['vocabulary_machine_name'])) {
       $new_vocab = new stdClass();
-      $new_vocab->machine_name = $machine_name;
-      $new_vocab->name = $label;
+      $new_vocab->machine_name = $vocab['vocabulary_machine_name'];
+      $new_vocab->name = $vocab['vocabulary_label'];
+      $new_vocab->description = $vocab['description'];
       taxonomy_vocabulary_save($new_vocab);
     }
   }
@@ -172,11 +170,9 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
   $prototypical_field_names_by_type = fields_creator_get_prototypical_field_names_by_type();
   $prototypical_fields = field_creator_get_prototypical_field_bases();
 
-  // The 2 key is the field type.
-  // @todo adapt $field_csv_settings to use string keys instead of numeric so
-  // that the key can be 'field type'
+  
   // Make sure that the field type of this field has a prototypical definition.
-  if ($proto_field_name = field_creator_get_prototypical_field_base_name($field_name, $field_csv_settings[2])) {
+  if ($proto_field_name = field_creator_get_prototypical_field_base_name($field_name, $field_csv_settings['type'])) {
 
     $field_config = $prototypical_fields[$proto_field_name];
     // Overwrite the field_name from the prototype array.
@@ -234,11 +230,13 @@ function field_creators_get_desired_field_instances() {
   $fields_from_csv = field_creator_get_fields_from_csv();
 
   foreach ($intersections as $field_name => $entity_types_and_bundles) {
-    // 2 just happens to be the csv column that has the field type.
-    // 0 is the most common field label.
-    if (!empty($fields_from_csv[$field_name][2]) && !empty($fields_from_csv[$field_name][0])) {
-      $field_type = $fields_from_csv[$field_name][2];
-      $field_label = $fields_from_csv[$field_name][0];
+    
+    if (!empty($fields_from_csv[$field_name]['type']) && !empty($fields_from_csv[$field_name]['name'])) {
+      $field_type = $fields_from_csv[$field_name]['type'];
+      $field_label = $fields_from_csv[$field_name]['name'];
+      $field_default = $fields_from_csv[$field_name]['default'];
+      $field_required = $fields_from_csv[$field_name]['required'];
+      $field_help = $fields_from_csv[$field_name]['help_text'];
       // Make sure that this field has a prototypical type. At first this module
       // is only supporting simple types like text and text_long. Not
       // entityreference.
@@ -250,7 +248,7 @@ function field_creators_get_desired_field_instances() {
           $entity_type_and_bundle_array = explode(' - ', $entity_type_and_bundle);
           if (count($entity_type_and_bundle_array) === 2) {
             list($entity_type, $bundle) = $entity_type_and_bundle_array;
-            if ($desired_instance = field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label)) {
+            if ($desired_instance = field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label, $field_default, $field_required, $field_help)) {
               $desired_instances[$entity_type . "-" . $bundle . "-" . $field_name] = $desired_instance;
             }
           }
@@ -338,14 +336,16 @@ function field_creator_get_prototypical_field_instance_name($field_name, $field_
  * Combine real field instance information with a list of instances that should
  * exist.
  */
-function field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label) {
+function field_creator_get_desired_field_instance($field_name, $prototypical_field_instance, $bundle, $entity_type, $field_label, $default_value, $field_required, $help_text) {
 
   $field_instance = $prototypical_field_instance;
 
-  // @todo, Add handling for these options.
-  $default_value = NULL;
-  $required = 0;
-  $help_text = '';
+  if ($field_required == ('Y' || 'y')){
+    $required = 1;
+  }
+  else{
+    $required = 0;
+  }
 
   $field_instance['bundle'] = $bundle;
   $field_instance['default_value'] = $default_value;
@@ -391,7 +391,7 @@ function field_creator_get_field_instances_from_csv() {
  */
 function field_creator_get_desired_taxonomy_vocabularies() {
   $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
-  return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
+  return field_creator_getMappingFromCSV($base_fields_csv_path);
 }
 
 /**
@@ -444,7 +444,7 @@ function field_creator_get_desired_taxonomy_vocabularies() {
 function field_creator_get_field_bundle_intersection_by_field() {
   $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundle_names = array_shift($desired_field_instances);
-
+  debug($bundle_names);
   $intersections_by_field = array();
   foreach ($desired_field_instances as $field_name => $csv_array) {
     foreach ($csv_array as $numeric_key => $possible_x) {
@@ -506,14 +506,28 @@ function field_creator_getMappingFromCSV($path, $key_column = NULL, $desired_val
 
 /**
  * Transform an array from a csv to be keyed by one of it's columns.
+ * @param type $csv_array
+ *  
+ * @param type $source_value_position
+ * @param type $desired_value_position
+ * @return type
  */
 function field_creator_csvArrayMappingGenerator($csv_array, $source_value_position = 0, $desired_value_position = FALSE) {
   $mapping = array();
-
+  
   foreach ($csv_array as $row) {
     if (!empty($row[$source_value_position])) {
       // @todo, should this be a separate param?
       if ($desired_value_position === FALSE) {
+        /*$labels = array_shift($csv_array);
+        for($x=0; $x<count($row); $x++){
+          $key = strtolower($labels[$x]);
+          $key = str_replace('#', 'num', $key);
+          $key = str_replace('/', 'or', $key);
+          $key = str_replace(' ', '_', $key);
+          $value[$key] = $row[$x];
+          
+        }*/
         $value = $row;
       }
       else {
@@ -525,6 +539,7 @@ function field_creator_csvArrayMappingGenerator($csv_array, $source_value_positi
       $mapping[trim($row[$source_value_position])] = $value;
     }
   }
+  //debug($mapping);
   return $mapping;
 }
 
