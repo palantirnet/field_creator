@@ -94,7 +94,6 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     module_load_include('install', 'field_creator');
     $desired_instance = field_creators_get_desired_field_instances();
     foreach ($desired_instance as $machine_name => $instance) {
-      // debug($machine_name);
       list($entity_type, $bundle, $field_name) = explode('-', $machine_name);
       $this->assertFieldInstance($entity_type, $field_name, $bundle);
     }

@@ -80,11 +80,12 @@ function field_creator_add_vocabularies() {
   $vocab_titles_by_machine_name = field_creator_get_desired_taxonomy_vocabularies();
 
   // Insert vocabularies for every machine name that doesn't exist yet.
-  foreach ($vocab_titles_by_machine_name as $machine_name => $label) {
-    if (FALSE === taxonomy_vocabulary_machine_name_load($machine_name)) {
+  foreach ($vocab_titles_by_machine_name as $vocab) {
+    if (FALSE === taxonomy_vocabulary_machine_name_load($vocab['vocabulary_machine_name'])) {
       $new_vocab = new stdClass();
-      $new_vocab->machine_name = $machine_name;
-      $new_vocab->name = $label;
+      $new_vocab->machine_name = $vocab['vocabulary_machine_name'];
+      $new_vocab->name = $vocab['vocabulary_label'];
+      $new_vocab->description = $vocab['description'];
       taxonomy_vocabulary_save($new_vocab);
     }
   }
