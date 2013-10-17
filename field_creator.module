@@ -25,8 +25,6 @@ function field_creator_init() {
  */
 function field_creator_field_creator_desired_field_config_alter(&$field_config, $field_csv_settings) {
 
-  // @todo, improve the csv handling so that this code doesn't need to rely on
-  // numeric keys.;
   $field_name = $field_csv_settings['machine_name'];
   $cardinality = $field_csv_settings['num_values'];
 
@@ -44,7 +42,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
   }
 
   if (strpos($field_name, 'field_ref_') === 0) {
-    // debug($field_csv_settings);
+   
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // Most of the reference fields can point at only one field type.
       // @todo, move to a csv.
@@ -76,14 +74,14 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
   elseif (strpos($field_name, 'field_refterm_') === 0) {
     // No longer pulling in fields with Vocabs.
     // @todo find out if this can be deleted.
-    /*if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
+    if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // @todo, this section of code could be moved to a helper function.
       $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
       $vocab_machine_names_by_field_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
       if (!empty($vocab_machine_names_by_field_machine_name[$field_name])) {
         $single_target_bundle = $vocab_machine_names_by_field_machine_name[$field_name];
       }
-    }*/
+    }
   }
 
   if (!empty($single_target_bundle)) {

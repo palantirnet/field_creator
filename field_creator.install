@@ -63,7 +63,7 @@ function field_creator_add_node_types() {
       node_type_save($type_info);
     }
     else {
-      drupal_set_message('The node type $type_machine_name already exists', 'warning');
+      drupal_set_message('The node type ' . $type_machine_name . ' already exists', 'warning');
     }
   }
 }
@@ -71,8 +71,7 @@ function field_creator_add_node_types() {
 /**
  * Load vocab data from a CSV and save any vocabularies that don't exist yet.
  *
- * @todo, currently this function pulls only machine names and labels. It does
- * not include descriptions which we may want to add.
+ * 
  */
 function field_creator_add_vocabularies() {
   
@@ -84,7 +83,7 @@ function field_creator_add_vocabularies() {
       $new_vocab = new stdClass();
       $new_vocab->machine_name = $vocab['vocabulary_machine_name'];
       $new_vocab->name = $vocab['vocabulary_label'];
-      $new_vocab->description = $vocab['description'];
+    //  $new_vocab->description = $vocab['description'];
       taxonomy_vocabulary_save($new_vocab);
     }
   }
@@ -169,8 +168,6 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
   $prototypical_fields = field_creator_get_prototypical_field_bases();
 
   // The 2 key is the field type.
-  // @todo adapt $field_csv_settings to use string keys instead of numeric so
-  // that the key can be 'field type'
   // Make sure that the field type of this field has a prototypical definition.
   if ($proto_field_name = field_creator_get_prototypical_field_base_name($field_name, $field_csv_settings['type'])) {
 
@@ -196,26 +193,26 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
  */
 function field_creator_get_prototypical_field_bases() {
   // @todo, add static caching
-  module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_fields = features_get_default('field_base', 'prototypical_fields_feature')) {
-    // @todo add hook_prototypical_field_bases_alter()
-    return $prototypical_fields;
+    module_load_include('inc', 'features', 'features.export');
+    if ($prototypical_fields = features_get_default('field_base', 'prototypical_fields_feature')) {
+      // @todo add hook_prototypical_field_bases_alter()
+      return $prototypical_fields;
+    }
+    return array();
   }
-  return array();
-}
 
 /**
  * Gets prototypical field instances from a Feature.
  */
 function field_creator_get_prototypical_field_instances() {
   // @todo, add static caching.
-  module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
-    // @todo add hook_prototypical_field_instances_alter()
-    return $prototypical_field_instances;
+    module_load_include('inc', 'features', 'features.export');
+    if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
+      // @todo add hook_prototypical_field_instances_alter()
+      return $prototypical_field_instances;
+    }
+    return array();
   }
-  return array();
-}
 
 /**
  * Combine prototypical field instances from Features and a csv.
@@ -230,8 +227,7 @@ function field_creators_get_desired_field_instances() {
   $fields_from_csv = field_creator_get_fields_from_csv();
 
   foreach ($intersections as $field_name => $entity_types_and_bundles) {
-    // 2 just happens to be the csv column that has the field type.
-    // 0 is the most common field label.
+    
     if (!empty($fields_from_csv[$field_name]['type']) && !empty($fields_from_csv[$field_name]['name'])) {
       $field_type = $fields_from_csv[$field_name]['type'];
       $field_label = $fields_from_csv[$field_name]['name'];
