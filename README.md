@@ -1,1 +1,4 @@
-This is a stub README that should eventually contain instructions for installing Field Creator with Drush Rush.
+This is the Drush Rush job for installing a test Drupal site that
+uses Field Creator module. It builds off a very small .make file.
+
+For documentation on how to use Drush Rush, see http://palantirnet.github.io/rush/
