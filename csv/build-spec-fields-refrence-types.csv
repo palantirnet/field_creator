@@ -1,0 +1,14 @@
+Field,Refrence
+field_ref_org_entities,org_entity
+field_ref_services,service
+field_ref_locations,location
+field_ref_events,event
+field_ref_conditions,condition
+field_ref_persons,person
+field_ref_video,video
+field_ref_slideshow,slideshow
+field_ref_pages,general_page
+field_ref_person_contact,person
+field_ref_org_entities_parents,org_entity
+field_ref_treatments,treatment
+field_ref_persons_author,person

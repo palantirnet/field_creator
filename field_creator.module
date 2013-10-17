@@ -48,21 +48,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // Most of the reference fields can point at only one field type.
       // @todo, move to a csv.
-      $target_bundle_by_field = array(
-        'field_ref_org_entities' => 'org_entity',
-        'field_ref_services' => 'service',
-        'field_ref_locations' => 'location',
-        'field_ref_events' => 'event',
-        'field_ref_conditions' => 'condition',
-        'field_ref_persons' => 'person',
-        'field_ref_video' => 'video',
-        'field_ref_slideshow' => 'slideshow',
-        'field_ref_pages' => 'general_page',
-        'field_ref_person_contact' => 'person',
-        'field_ref_org_entities_parents' => 'org_entity',
-        'field_ref_treatments' => 'treatment',
-        'field_ref_persons_author' => 'person',
-      );
+      $target_bundle_by_field = field_creator_get_desired_field_refrences();
 
       if (!empty($target_bundle_by_field[$field_name])) {
         $single_target_bundle = $target_bundle_by_field[$field_name];
@@ -91,4 +77,14 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
       $single_target_bundle => $single_target_bundle,
     );
   }
+}
+
+/**
+ * Gets refrence field information from a CSV file.
+ *
+ */
+function field_creator_get_desired_field_refrences() {
+  module_load_include('install', 'field_creator');
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-refrence-types.csv';
+  return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
 }
