@@ -195,26 +195,40 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
  * proto config.
  */
 function field_creator_get_prototypical_field_bases() {
-  // @todo, add static caching
-  module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_fields = features_get_default('field_base', 'prototypical_fields_feature')) {
-    // @todo add hook_prototypical_field_bases_alter()
+  $prototypical_fields = &drupal_static(__FUNCTION__);
+
+  if(empty($prototypical_fields)) {
+    module_load_include('inc', 'features', 'features.export');
+    if ($prototypical_fields = features_get_default('field_base', 'prototypical_fields_feature')) {
+      // @todo add hook_prototypical_field_bases_alter()
+      drupal_static('prototypical_fields', $prototypical_fields);
+      return $prototypical_fields;
+    }
+    return array();
+  }
+  else {
     return $prototypical_fields;
   }
-  return array();
 }
 
 /**
  * Gets prototypical field instances from a Feature.
  */
 function field_creator_get_prototypical_field_instances() {
-  // @todo, add static caching.
-  module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
-    // @todo add hook_prototypical_field_instances_alter()
-    return $prototypical_field_instances;
+  $prototypical_fields = &drupal_static(__FUNCTION__);
+
+  if(empty($prototypical_fields)) {
+    module_load_include('inc', 'features', 'features.export');
+    if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
+      // @todo add hook_prototypical_field_instances_alter()
+      drupal_static('prototypical_fields', $prototypical_fields);
+      return $prototypical_field_instances;
+    }
+    return array();
   }
-  return array();
+  else {
+    return $prototypical_fields;
+  }
 }
 
 /**
