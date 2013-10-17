@@ -3,6 +3,7 @@ description = Create fields based on the build spec.
 core = 7.x
 package = Fields
 files[] = field_creator.test
+files[] = field_creator.csv.test
 dependencies[] = prototypical_fields_feature
 ; @todo remove
 dependencies[] = simpletest
