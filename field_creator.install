@@ -195,19 +195,19 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
  * proto config.
  */
 function field_creator_get_prototypical_field_bases() {
-  $prototypical_fields = &drupal_static(__FUNCTION__);
+  $prototypical_field_bases = &drupal_static(__FUNCTION__);
 
-  if(empty($prototypical_fields)) {
+  if(empty($prototypical_field_bases)) {
     module_load_include('inc', 'features', 'features.export');
-    if ($prototypical_fields = features_get_default('field_base', 'prototypical_fields_feature')) {
+    if ($prototypical_field_bases = features_get_default('field_base', 'prototypical_fields_feature')) {
       // @todo add hook_prototypical_field_bases_alter()
-      drupal_static('prototypical_fields', $prototypical_fields);
-      return $prototypical_fields;
+      drupal_static('prototypical_field_bases', $prototypical_field_bases);
+      return $prototypical_field_bases;
     }
     return array();
   }
   else {
-    return $prototypical_fields;
+    return $prototypical_field_bases;
   }
 }
 
@@ -215,19 +215,19 @@ function field_creator_get_prototypical_field_bases() {
  * Gets prototypical field instances from a Feature.
  */
 function field_creator_get_prototypical_field_instances() {
-  $prototypical_fields = &drupal_static(__FUNCTION__);
+  $prototypical_field_instances = &drupal_static(__FUNCTION__);
 
-  if(empty($prototypical_fields)) {
+  if(empty($prototypical_field_instances)) {
     module_load_include('inc', 'features', 'features.export');
-    if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
+    if ($prototypical_field_instance_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
       // @todo add hook_prototypical_field_instances_alter()
-      drupal_static('prototypical_fields', $prototypical_fields);
+      drupal_static('prototypical_field_instances', $prototypical_field_instances);
       return $prototypical_field_instances;
     }
     return array();
   }
   else {
-    return $prototypical_fields;
+    return $prototypical_field_instances;
   }
 }
 
