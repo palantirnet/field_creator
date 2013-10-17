@@ -158,9 +158,6 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     $this->assertIdentical($settings['handler'], 'base');
     // There should be only one target bundle.
     $this->assertIdentical(count($target_bundles), 1);
-    
-    debug($settings);
-    
     $this->assertIdentical($target_bundles['event_type'], 'event_type');
     $this->assertIdentical($settings['target_type'], 'taxonomy_term');
   }

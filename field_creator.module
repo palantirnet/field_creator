@@ -25,6 +25,8 @@ function field_creator_init() {
  */
 function field_creator_field_creator_desired_field_config_alter(&$field_config, $field_csv_settings) {
 
+  // @todo, improve the csv handling so that this code doesn't need to rely on
+  // numeric keys.;
   $field_name = $field_csv_settings['machine_name'];
   $cardinality = $field_csv_settings['num_values'];
 
@@ -42,7 +44,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
   }
 
   if (strpos($field_name, 'field_ref_') === 0) {
-   
+    // debug($field_csv_settings);
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // Most of the reference fields can point at only one field type.
       // @todo, move to a csv.
