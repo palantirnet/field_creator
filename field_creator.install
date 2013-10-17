@@ -195,7 +195,7 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
  * proto config.
  */
 function field_creator_get_prototypical_field_bases() {
-  $prototypical_field_bases = &drupal_static(__FUNCTION__);
+  $prototypical_field_bases = &drupal_static(__METHOD__);
 
   if(empty($prototypical_field_bases)) {
     module_load_include('inc', 'features', 'features.export');
@@ -215,7 +215,7 @@ function field_creator_get_prototypical_field_bases() {
  * Gets prototypical field instances from a Feature.
  */
 function field_creator_get_prototypical_field_instances() {
-  $prototypical_field_instances = &drupal_static(__FUNCTION__);
+  $prototypical_field_instances = &drupal_static(__METHOD__);
 
   if(empty($prototypical_field_instances)) {
     module_load_include('inc', 'features', 'features.export');
