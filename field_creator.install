@@ -32,8 +32,8 @@ function field_get_desired_node_types() {
   $base_types_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-node-types.csv';
   $types = field_creator_getMappingFromCSV($base_types_csv_path, 0, 1);
 
-  foreach($types as $node_type_machine_name => $label) {
-    $type_info = new stdClass;
+  foreach ($types as $node_type_machine_name => $label) {
+    $type_info = new stdClass();
     $type_info->type = $node_type_machine_name;
     $type_info->name = $label;
     $type_info->base = 'node_content';
@@ -63,19 +63,16 @@ function field_creator_add_node_types() {
       node_type_save($type_info);
     }
     else {
-      drupal_set_message('The node type $type_machine_name already exists', 'warning');
+      drupal_set_message('The node type ' . $type_machine_name . ' already exists', 'warning');
     }
   }
 }
 
 /**
  * Load vocab data from a CSV and save any vocabularies that don't exist yet.
- *
- * @todo, currently this function pulls only machine names and labels. It does
- * not include descriptions which we may want to add.
  */
 function field_creator_add_vocabularies() {
-  
+
   $vocab_titles_by_machine_name = field_creator_get_desired_taxonomy_vocabularies();
 
   // Insert vocabularies for every machine name that doesn't exist yet.
@@ -169,8 +166,6 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
   $prototypical_fields = field_creator_get_prototypical_field_bases();
 
   // The 2 key is the field type.
-  // @todo adapt $field_csv_settings to use string keys instead of numeric so
-  // that the key can be 'field type'
   // Make sure that the field type of this field has a prototypical definition.
   if ($proto_field_name = field_creator_get_prototypical_field_base_name($field_name, $field_csv_settings['type'])) {
 
@@ -230,8 +225,7 @@ function field_creators_get_desired_field_instances() {
   $fields_from_csv = field_creator_get_fields_from_csv();
 
   foreach ($intersections as $field_name => $entity_types_and_bundles) {
-    // 2 just happens to be the csv column that has the field type.
-    // 0 is the most common field label.
+
     if (!empty($fields_from_csv[$field_name]['type']) && !empty($fields_from_csv[$field_name]['name'])) {
       $field_type = $fields_from_csv[$field_name]['type'];
       $field_label = $fields_from_csv[$field_name]['name'];
@@ -341,10 +335,10 @@ function field_creator_get_desired_field_instance($field_name, $prototypical_fie
 
   $field_instance = $prototypical_field_instance;
 
- if ($field_required == ('Y' || 'y')){
+  if ($field_required == ('Y' || 'y')) {
     $required = 1;
   }
-  else{
+  else {
     $required = 0;
   }
 
@@ -445,10 +439,10 @@ function field_creator_get_desired_taxonomy_vocabularies() {
 function field_creator_get_field_bundle_intersection_by_field() {
   $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundles = array_keys(reset($desired_field_instances));
-  foreach($bundles as $bundle){
+  foreach ($bundles as $bundle) {
     $bundle_names[$bundle] = str_replace('_', ' ', $bundle);
   }
-  
+
   $intersections_by_field = array();
   foreach ($desired_field_instances as $field_name => $csv_array) {
     foreach ($csv_array as $numeric_key => $possible_x) {
@@ -514,19 +508,19 @@ function field_creator_getMappingFromCSV($path, $key_column = NULL, $desired_val
 function field_creator_csvArrayMappingGenerator($csv_array, $source_value_position = 0, $desired_value_position = FALSE) {
   $mapping = array();
   $labels = array_shift($csv_array);
-  
+
   foreach ($csv_array as $row) {
     if (!empty($row[$source_value_position])) {
       // @todo, should this be a separate param?
       if ($desired_value_position === FALSE) {
-        
-        for($x=0; $x<count($row); $x++){
+
+        for ($x = 0; $x < count($row); $x++) {
           $key = strtolower($labels[$x]);
           $key = str_replace('#', 'num', $key);
           $key = str_replace('/', 'or', $key);
           $key = str_replace(' ', '_', $key);
           $value[$key] = $row[$x];
-          
+
         }
       }
       else {
