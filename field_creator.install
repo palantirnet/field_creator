@@ -32,8 +32,8 @@ function field_get_desired_node_types() {
   $base_types_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-node-types.csv';
   $types = field_creator_getMappingFromCSV($base_types_csv_path, 0, 1);
 
-  foreach($types as $node_type_machine_name => $label) {
-    $type_info = new stdClass;
+  foreach ($types as $node_type_machine_name => $label) {
+    $type_info = new stdClass();
     $type_info->type = $node_type_machine_name;
     $type_info->name = $label;
     $type_info->base = 'node_content';
@@ -70,11 +70,9 @@ function field_creator_add_node_types() {
 
 /**
  * Load vocab data from a CSV and save any vocabularies that don't exist yet.
- *
- * 
  */
 function field_creator_add_vocabularies() {
-  
+
   $vocab_titles_by_machine_name = field_creator_get_desired_taxonomy_vocabularies();
 
   // Insert vocabularies for every machine name that doesn't exist yet.
@@ -227,7 +225,7 @@ function field_creators_get_desired_field_instances() {
   $fields_from_csv = field_creator_get_fields_from_csv();
 
   foreach ($intersections as $field_name => $entity_types_and_bundles) {
-    
+
     if (!empty($fields_from_csv[$field_name]['type']) && !empty($fields_from_csv[$field_name]['name'])) {
       $field_type = $fields_from_csv[$field_name]['type'];
       $field_label = $fields_from_csv[$field_name]['name'];
@@ -337,10 +335,10 @@ function field_creator_get_desired_field_instance($field_name, $prototypical_fie
 
   $field_instance = $prototypical_field_instance;
 
- if ($field_required == ('Y' || 'y')){
+  if ($field_required == ('Y' || 'y')) {
     $required = 1;
   }
-  else{
+  else {
     $required = 0;
   }
 
@@ -441,10 +439,10 @@ function field_creator_get_desired_taxonomy_vocabularies() {
 function field_creator_get_field_bundle_intersection_by_field() {
   $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundles = array_keys(reset($desired_field_instances));
-  foreach($bundles as $bundle){
+  foreach ($bundles as $bundle) {
     $bundle_names[$bundle] = str_replace('_', ' ', $bundle);
   }
-  
+
   $intersections_by_field = array();
   foreach ($desired_field_instances as $field_name => $csv_array) {
     foreach ($csv_array as $numeric_key => $possible_x) {
@@ -510,19 +508,19 @@ function field_creator_getMappingFromCSV($path, $key_column = NULL, $desired_val
 function field_creator_csvArrayMappingGenerator($csv_array, $source_value_position = 0, $desired_value_position = FALSE) {
   $mapping = array();
   $labels = array_shift($csv_array);
-  
+
   foreach ($csv_array as $row) {
     if (!empty($row[$source_value_position])) {
       // @todo, should this be a separate param?
       if ($desired_value_position === FALSE) {
-        
-        for($x=0; $x<count($row); $x++){
+
+        for ($x = 0; $x < count($row); $x++) {
           $key = strtolower($labels[$x]);
           $key = str_replace('#', 'num', $key);
           $key = str_replace('/', 'or', $key);
           $key = str_replace(' ', '_', $key);
           $value[$key] = $row[$x];
-          
+
         }
       }
       else {
