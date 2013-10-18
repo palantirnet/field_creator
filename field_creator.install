@@ -192,7 +192,7 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
 function field_creator_get_prototypical_field_bases() {
   $prototypical_field_bases = &drupal_static(__METHOD__);
 
-  if(empty($prototypical_field_bases)) {
+  if (empty($prototypical_field_bases)) {
     module_load_include('inc', 'features', 'features.export');
     if ($prototypical_field_bases = features_get_default('field_base', 'prototypical_fields_feature')) {
       // @todo add hook_prototypical_field_bases_alter()
@@ -212,7 +212,7 @@ function field_creator_get_prototypical_field_bases() {
 function field_creator_get_prototypical_field_instances() {
   $prototypical_field_instances = &drupal_static(__METHOD__);
 
-  if(empty($prototypical_field_instances)) {
+  if (empty($prototypical_field_instances)) {
     module_load_include('inc', 'features', 'features.export');
     if ($prototypical_field_instance_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
       // @todo add hook_prototypical_field_instances_alter()
