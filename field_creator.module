@@ -19,7 +19,7 @@ function field_creator_init() {
   // hook_field_creator_suggested_field_base_config_alter()
   // hook_field_creator_suggested_field_instance_config_alter()
   // hook_field_creator_suggested_field_base_name_alter()
-  field_creator_load();
+  
 }
 /**
  * Implements hook_field_creator_desired_field_config_alter().
