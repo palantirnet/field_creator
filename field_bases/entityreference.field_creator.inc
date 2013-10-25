@@ -11,7 +11,7 @@ function entityreference_field_creator_base() {
   $fields = array();
 
   // Exported field_base: 'field_ref_proto'
-  $field_bases['field_ref_proto'] = array(
+  $fields['field_ref_proto'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
@@ -54,7 +54,7 @@ function entityreference_field_creator_base() {
   );
 
   // Exported field_base: 'field_refterm_proto'
-  $field_bases['field_refterm_proto'] = array(
+  $fields['field_refterm_proto'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,

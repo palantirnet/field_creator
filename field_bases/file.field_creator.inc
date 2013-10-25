@@ -41,7 +41,7 @@ function file_field_creator_base() {
   );
 
   // Exported field_base: 'field_files_proto'
-  $field_bases['field_files_proto'] = array(
+  $fields['field_files_proto'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,
