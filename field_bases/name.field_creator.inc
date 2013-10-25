@@ -11,7 +11,7 @@ function name_field_creator_base() {
   $fields = array();
 
   // Exported field_base: 'field_name_proto'
-  $field_bases['field_name_proto'] = array(
+  $fields['field_name_proto'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,

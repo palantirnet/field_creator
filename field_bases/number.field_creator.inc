@@ -10,7 +10,7 @@
 function number_field_creator_base() {
   $fields = array();
   // Exported field_base: 'field_int_proto'
-  $field_bases['field_int_proto'] = array(
+  $fields['field_int_proto'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,

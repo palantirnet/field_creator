@@ -11,7 +11,7 @@ function link_field_creator_base() {
   $fields = array();
 
   // Exported field_base: 'field_links_proto'
-  $field_bases['field_links_proto'] = array(
+  $fields['field_links_proto'] = array(
     'active' => 1,
     'cardinality' => -1,
     'deleted' => 0,

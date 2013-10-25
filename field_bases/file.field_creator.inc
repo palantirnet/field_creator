@@ -10,7 +10,7 @@
 function file_field_creator_base() {
   $fields = array();
   // Exported field_base: 'field_file_video_proto'
-  $field_bases['field_file_video_proto'] = array(
+  $fields['field_file_video_proto'] = array(
     'active' => 1,
     'cardinality' => 1,
     'deleted' => 0,
