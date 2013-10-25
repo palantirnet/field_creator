@@ -8,6 +8,8 @@
  * Implements hook_field_creator_base().
  */
 function text_field_creator_base() {
+  $fields = array();
+  
   $fields['field_text_long_proto'] = array(
     'active' => 1,
     'cardinality' => 1,

@@ -192,7 +192,11 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
 function field_creator_get_prototypical_field_bases() {
   module_load_include('module', 'field_creator');
   
-  return field_creator_load();
+  if ($prototypical_field_bases = field_creator_load()) {
+    // @todo add hook_prototypical_field_instances_alter()
+    return $prototypical_field_bases;
+  }
+  return array();
 }
 
 /**

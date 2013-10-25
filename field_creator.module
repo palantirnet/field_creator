@@ -103,7 +103,7 @@ function field_creator_load(){
   
   // Load each file and dig out its field bases.
   foreach ($files as $filepath => $file) {
-    require $filepath;
+    require_once $filepath;
     
     $m = module_invoke_all('field_creator_base');
     
