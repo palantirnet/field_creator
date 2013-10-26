@@ -6,7 +6,6 @@
  * @copyright (C) Copyright 2013 Palantir.net, Inc.
  */
 
-
 /**
  * Get an array that has categories as keys and country entries as values.
  */
@@ -54,7 +53,9 @@ function field_creator_csvArrayMappingGenerator($csv_array, $source_value_positi
  */
 function field_creator_csvToArray($file_path) {
 
-  $arrays = &drupal_static(__METHOD__);
+  //  $arrays = &drupal_static(__METHOD__);
+  $arrays = array();
+
   if (!isset($arrays[$file_path])) {
     if (($handle = fopen($file_path, "r")) !== FALSE) {
       while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
