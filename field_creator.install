@@ -124,7 +124,8 @@ function field_creator_create_field_instances() {
     // "node-org_entity-field_text_title_short".
     list($entity, $bundle, $field_name) = explode('-', $field_instance_name);
     // Make sure the field instance does not exist yet.
-    if (field_info_instance($entity, $field_name, $bundle) === NULL) {
+    $foo = field_info_instance($entity, $field_name, $bundle);
+    if ($foo === NULL) {
       field_create_instance($field_instance);
     }
   }
@@ -231,7 +232,7 @@ function field_creators_get_desired_field_instances() {
       $field_label = $fields_from_csv[$field_name]['name'];
       $field_default = $fields_from_csv[$field_name]['default'];
       $field_required = $fields_from_csv[$field_name]['required'];
-      $field_help = $fields_from_csv[$field_name]['help_text'];
+      $field_help = $fields_from_csv[$field_name]['help text'];
       // Make sure that this field has a prototypical type. At first this module
       // is only supporting simple types like text and text_long. Not
       // entityreference.
@@ -440,7 +441,8 @@ function field_creator_get_field_bundle_intersection_by_field() {
   $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundles = array_keys(reset($desired_field_instances));
   foreach ($bundles as $bundle) {
-    $bundle_names[$bundle] = str_replace('_', ' ', $bundle);
+    //
+    $bundle_names[$bundle] = $bundle;
   }
 
   $intersections_by_field = array();
@@ -518,7 +520,6 @@ function field_creator_csvArrayMappingGenerator($csv_array, $source_value_positi
           $key = strtolower($labels[$x]);
           $key = str_replace('#', 'num', $key);
           $key = str_replace('/', 'or', $key);
-          $key = str_replace(' ', '_', $key);
           $value[$key] = $row[$x];
 
         }

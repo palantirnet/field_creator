@@ -95,6 +95,9 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     $desired_instance = field_creators_get_desired_field_instances();
     foreach ($desired_instance as $machine_name => $instance) {
       list($entity_type, $bundle, $field_name) = explode('-', $machine_name);
+      if (($entity_type == 'node') && ($field_name == 'field_text_legacy_seo_category')){
+        sleep(1);
+      }
       $this->assertFieldInstance($entity_type, $field_name, $bundle);
     }
   }

@@ -26,8 +26,8 @@ function field_creator_init() {
  */
 function field_creator_field_creator_desired_field_config_alter(&$field_config, $field_csv_settings) {
 
-  $field_name = $field_csv_settings['machine_name'];
-  $cardinality = $field_csv_settings['num_values'];
+  $field_name = $field_csv_settings['machine name'];
+  $cardinality = $field_csv_settings['num values'];
 
   if (!empty($cardinality)  && !empty($field_config['cardinality'])) {
     if ($cardinality === 'unlimited') {
