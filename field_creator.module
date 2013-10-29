@@ -91,12 +91,13 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
 }
 /**
  * Load field base include files.
- * 
- * @param type $is_instance Optional, set to true if you want the field instances.
- * @return type An array of either field bases or instances.
+ *
+ * @param boolean $is_instance
+ *   Optional, set to true if you want the field instances.
+ * @return array
+ *   An array of either field bases or instances.
  */
-
-function field_creator_load($is_instance = false){
+function field_creator_load($is_instance = FALSE) {
   // Find all the files in the directory with the correct extension.
   $include_path = drupal_get_path('module', 'field_creator') . '/fields';
   $files = file_scan_directory($include_path, "/\.field_creator\.inc$/");
@@ -108,13 +109,12 @@ function field_creator_load($is_instance = false){
   foreach ($files as $filepath => $file) {
     require_once $filepath;
   }
-  if(!$is_instance){
+  if (!$is_instance) {
     $fields = module_invoke_all('field_creator_base');
   }
-  else{
+  else {
     $fields = module_invoke_all('field_creator_instance');
   }
 
-  return($fields);
-
+  return $fields;
 }
