@@ -192,7 +192,7 @@ function field_creator_get_desired_field_config($field_name, $field_csv_settings
  */
 function field_creator_get_prototypical_field_bases() {
   module_load_include('module', 'field_creator');
-  
+
   if ($prototypical_field_bases = field_creator_load()) {
     // @todo add hook_prototypical_field_instances_alter()
     return $prototypical_field_bases;
@@ -441,7 +441,6 @@ function field_creator_get_field_bundle_intersection_by_field() {
   $desired_field_instances = field_creator_get_field_instances_from_csv();
   $bundles = array_keys(reset($desired_field_instances));
   foreach ($bundles as $bundle) {
-    //
     $bundle_names[$bundle] = $bundle;
   }
 

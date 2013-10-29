@@ -19,7 +19,6 @@ function field_creator_init() {
   // hook_field_creator_suggested_field_base_config_alter()
   // hook_field_creator_suggested_field_instance_config_alter()
   // hook_field_creator_suggested_field_base_name_alter()
-
 }
 /**
  * Implements hook_field_creator_desired_field_config_alter().
@@ -90,10 +89,10 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
     );
   }
 }
-/*
+/**
  * Load field base include files.
  */
-function field_creator_load(){
+function field_creator_load() {
   // Find all the files in the directory with the correct extension.
   $include_path = drupal_get_path('module', 'field_creator') . '/field_bases';
   $files = file_scan_directory($include_path, "/\.field_creator\.inc$/");
@@ -107,6 +106,6 @@ function field_creator_load(){
   }
   $base_fields = module_invoke_all('field_creator_base');
 
-  return($base_fields);
+  return ($base_fields);
 
 }
