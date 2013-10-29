@@ -96,7 +96,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
  * @return array
  *   An array of field bases.
  */
-function field_creator_load() {
+function field_creator_load_base() {
   $fields = &drupal_static(__FUNCTION__);
 
   if (!isset($fields)) {
@@ -125,7 +125,7 @@ function field_creator_load_instance() {
 }
 
 /**
- * Helper to load include files on behald of other modules.
+ * Helper to load include files on behalf of other modules.
  *
  * NOTE: module_load_all_includes() won't work because we store files on
  * behalf of other modules.
