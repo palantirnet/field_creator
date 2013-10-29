@@ -89,32 +89,61 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
     );
   }
 }
+
 /**
  * Load field base include files.
  *
- * @param boolean $is_instance
- *   Optional, set to true if you want the field instances.
  * @return array
- *   An array of either field bases or instances.
+ *   An array of field bases.
  */
-function field_creator_load($is_instance = FALSE) {
+function field_creator_load() {
+  $fields = &drupal_static(__FUNCTION__);
+
+  if (!isset($fields)) {
+    field_creator_load_includes();
+    $fields = module_invoke_all('field_creator_base');
+  }
+
+  return $fields;
+}
+
+/**
+ * Load field instance include files.
+ *
+ * @return array
+ *   An array of field instances.
+ */
+function field_creator_load_instance() {
+  $fields = &drupal_static(__FUNCTION__);
+
+  if (!isset($fields)) {
+    field_creator_load_includes();
+    $fields = module_invoke_all('field_creator_instance');
+  }
+
+  return $fields;
+}
+
+/**
+ * Helper to load include files on behald of other modules.
+ *
+ * NOTE: module_load_all_includes() won't work because we store files on
+ * behalf of other modules.
+ */
+function field_creator_load_includes() {
+  $loaded = &drupal_static(__FUNCTION__);
+
+  if (isset($loaded)) {
+    return;
+  }
   // Find all the files in the directory with the correct extension.
   $include_path = drupal_get_path('module', 'field_creator') . '/fields';
   $files = file_scan_directory($include_path, "/\.field_creator\.inc$/");
-
-  // Build up an array of all field bases with whose module is enabled.
-  $fields = array();
 
   // Load each file and dig out its field bases.
   foreach ($files as $filepath => $file) {
     require_once $filepath;
   }
-  if (!$is_instance) {
-    $fields = module_invoke_all('field_creator_base');
-  }
-  else {
-    $fields = module_invoke_all('field_creator_instance');
-  }
 
-  return $fields;
+  $loaded = TRUE;
 }
