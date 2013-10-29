@@ -205,8 +205,8 @@ function field_creator_get_prototypical_field_bases() {
  */
 function field_creator_get_prototypical_field_instances() {
   // @todo, add static caching.
-  module_load_include('inc', 'features', 'features.export');
-  if ($prototypical_field_instances = features_get_default('field_instance', 'prototypical_fields_feature')) {
+  module_load_include('module', 'field_creator');
+  if ($prototypical_field_instances = field_creator_load(true)) {
     // @todo add hook_prototypical_field_instances_alter()
     return $prototypical_field_instances;
   }
