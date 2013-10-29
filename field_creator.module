@@ -98,7 +98,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
 
 function field_creator_load($is_instance = false){
   // Find all the files in the directory with the correct extension.
-  $include_path = drupal_get_path('module', 'field_creator') . '/field_bases';
+  $include_path = drupal_get_path('module', 'field_creator') . '/fields';
   $files = file_scan_directory($include_path, "/\.field_creator\.inc$/");
 
   // Build up an array of all field bases with whose module is enabled.
