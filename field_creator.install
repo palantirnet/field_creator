@@ -67,3 +67,31 @@ function field_creator_csvToArray($file_path) {
 
   return $arrays[$file_path];
 }
+
+/**
+ * Convert a Csv to an array.
+ */
+class csvToArray {
+
+  public $file_path;
+
+  public function __construct($file_path) {
+    $this->file_path = $file_path;
+  }
+
+  public function getSimpleArray() {
+    $return = array();
+
+    $file_path = $this->file_path;
+
+    if (($handle = fopen($file_path, "r")) !== FALSE) {
+      while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+        $return[] = $data;
+      }
+      fclose($handle);
+    }
+    // @todo should the return value be set as a property on so as to avoid
+    // reading fopen over and over?
+    return $return;
+  }
+}

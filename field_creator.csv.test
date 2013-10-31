@@ -55,7 +55,8 @@ class FieldCreatorCsvUnitTests extends PHPUnit_Framework_TestCase  {
    * @dataProvider dataProviderForTestUnitTestOfCsvToArray
    */
   public function testUnitTestOfCsvToArray($csv_file_path, $expected_csv_array) {
-    $csv_array = field_creator_csvToArray($csv_file_path);
+    $csv_to_array = new csvToArray($csv_file_path);
+    $csv_array = $csv_to_array->getSimpleArray();
     $this->assertTRUE($expected_csv_array === $csv_array, 'The csv array is identical to the expected array.');
 
     // Verify that a single change to a value makes the expected value and the
