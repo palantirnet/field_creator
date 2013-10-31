@@ -20,6 +20,60 @@ function field_creator_init() {
   // hook_field_creator_suggested_field_instance_config_alter()
   // hook_field_creator_suggested_field_base_name_alter()
 }
+
+/**
+ * Implements hook_menu()
+ */
+function field_creator_menu(){
+  $items = array();
+  
+  $items['admin/config/development/field_creator'] = array(
+    'title' => 'Field Creator',
+    'description' => 'Configuration for the field creator module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('field_creator_build_form'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+}
+
+/**
+ * 
+ * @param type $form
+ * @param type $form_state
+ * @return array
+ */
+function field_creator_build_form($form, &$form_state){
+  
+  // Help text
+  $form['help']['$markup'] = '<p>' . t('You can press the button below to build your fields.
+    Make sure the csv files are filled out and that you have enabled all of the modules for the 
+    fields you want to use.') . '</p>';
+  
+  // Button
+  $form['submit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Build fields'),
+  );
+  return $form;
+}
+
+/**
+ * A submit callback for field_creator_build_form().
+ *
+ * @param array $form
+ *   A normal Drupal form array.
+ *
+ * @param array $form_state
+ *   A normal Drupal form_state array.
+ */
+function field_creator_build_form_submit($form, &$form_state) {
+  field_creator_add_node_types();
+  field_creator_add_vocabularies();
+  field_creator_create_field_bases();
+  field_creator_create_field_instances();
+  variable_set('menu_rebuild_needed', TRUE);
+}
+
 /**
  * Implements hook_field_creator_desired_field_config_alter().
  */
