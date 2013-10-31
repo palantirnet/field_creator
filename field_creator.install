@@ -120,12 +120,11 @@ function field_creator_create_field_instances() {
     if (!field_info_field($field_instance['field_name'])) {
       continue;
     }
-    // $field_instance name should look like
+     // $field_instance name should look like
     // "node-org_entity-field_text_title_short".
     list($entity, $bundle, $field_name) = explode('-', $field_instance_name);
     // Make sure the field instance does not exist yet.
-    $foo = field_info_instance($entity, $field_name, $bundle);
-    if ($foo === NULL) {
+    if (field_info_instance($entity, $field_name, $bundle) === NULL) {
       field_create_instance($field_instance);
     }
   }
