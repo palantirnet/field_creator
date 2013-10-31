@@ -7,7 +7,8 @@
  * @copyright (C) Copyright 2013 Palantir.net, Inc.
  */
 
-
+// @todo, these includes should be replaced with something more standard. Certainly not the
+// Drupal install file.
 include_once 'field_creator.install';
 require 'vendor/autoload.php';
 
@@ -18,7 +19,6 @@ require 'vendor/autoload.php';
  * of Drupal. These tests could then be done through PHPUnit.
  */
 class FieldCreatorCsvUnitTests extends PHPUnit_Framework_TestCase  {
-
 
   /**
    * Basic test information.
@@ -40,24 +40,30 @@ class FieldCreatorCsvUnitTests extends PHPUnit_Framework_TestCase  {
     return  'test_csv/' . $name . '.csv';
   }
 
+  public function dataProviderForTestUnitTestOfCsvToArray() {
+    return array(
+      array(
+        $this->getCsvFilePath('foods'),
+        $this->getExpectedFoodArray(),
+      )
+    );
+  }
+
   /**
    * Unit test of field_creator_csvToArray().
+   *
+   * @dataProvider dataProviderForTestUnitTestOfCsvToArray
    */
-  public function testUnitTestOfCsvToArray() {
-
-    $foods_csv_path = $this->getCsvFilePath('foods');
-    $csv_array = field_creator_csvToArray($foods_csv_path);
-
-    // This is the array that should be returned from $csv_array
-    $expected_cvs_array = $this->getExpectedFoodArray();
-    $this->assertTRUE($expected_cvs_array === $csv_array, 'The csv array is identical to the expected array.');
+  public function testUnitTestOfCsvToArray($csv_file_path, $expected_csv_array) {
+    $csv_array = field_creator_csvToArray($csv_file_path);
+    $this->assertTRUE($expected_csv_array === $csv_array, 'The csv array is identical to the expected array.');
 
     // Verify that a single change to a value makes the expected value and the
     // derived value un-identical.
     // First check that the last value in the last array is 'Chicken'
     $this->assertTRUE($csv_array[3][3] === 'Chicken', 'The last value in the last array matches the expected value.');
     $csv_array[3][3] = 'Chickan';
-    $this->assertTRUE($expected_cvs_array !== $csv_array, 'Changing a value the csv array causes it to no longer be identical to the expected array.');
+    $this->assertTRUE($expected_csv_array !== $csv_array, 'Changing a value the csv array causes it to no longer be identical to the expected array.');
   }
 
   /**
