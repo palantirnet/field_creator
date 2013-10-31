@@ -78,7 +78,8 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
 
 /**
  * Gets reference field information from a CSV file.
- *
+ * @return array
+ * An array of refrence fields as keys and the CT being refrenced.
  */
 function field_creator_get_desired_field_references() {
   module_load_include('install', 'field_creator');
