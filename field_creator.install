@@ -10,11 +10,7 @@
  * Implements hook_enable().
  */
 function field_creator_enable() {
-  field_creator_add_node_types();
-  field_creator_add_vocabularies();
-  field_creator_create_field_bases();
-  field_creator_create_field_instances();
-  variable_set('menu_rebuild_needed', TRUE);
+
 }
 
 
