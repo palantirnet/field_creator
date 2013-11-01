@@ -75,7 +75,7 @@ class FieldCreatorTests extends FieldCreatorTestCase {
     return array(
       'name' => 'Test field_creators',
       'description' => 'Test field instances and base definitions.',
-      'group' => 'Fields',
+      'group' => 'Field Creator',
     );
   }
 
