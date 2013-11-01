@@ -27,13 +27,16 @@ function field_creator_init() {
 function field_creator_menu(){
   $items = array();
   
-  $items['admin/config/development/field_creator'] = array(
+  $items['admin/config/development/field-creator'] = array(
     'title' => 'Field Creator',
     'description' => 'Configuration for the field creator module.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('field_creator_build_form'),
+    'access arguments' => array('administer users'),
     'type' => MENU_NORMAL_ITEM,
   );
+  
+  return $items;
 }
 
 /**
@@ -45,7 +48,7 @@ function field_creator_menu(){
 function field_creator_build_form($form, &$form_state){
   
   // Help text
-  $form['help']['$markup'] = '<p>' . t('You can press the button below to build your fields.
+  $form['help']['#markup'] = '<p>' . t('You can press the button below to build your fields.
     Make sure the csv files are filled out and that you have enabled all of the modules for the 
     fields you want to use.') . '</p>';
   
