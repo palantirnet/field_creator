@@ -81,7 +81,7 @@ function field_creator_add_vocabularies() {
       $new_vocab = new stdClass();
       $new_vocab->machine_name = $vocab['vocabulary_machine_name'];
       $new_vocab->name = $vocab['vocabulary_label'];
-      $new_vocab->description = $vocab['description'];
+    //  $new_vocab->description = $vocab['description'];
       taxonomy_vocabulary_save($new_vocab);
     }
   }
@@ -385,7 +385,7 @@ function field_creator_get_field_instances_from_csv() {
  * ?key=0Ar_4shGH7HJ1dGxDZmJQVlVEaFBvYlJ0dXY0WmJ0dEE#gid=19
  */
 function field_creator_get_desired_taxonomy_vocabularies() {
-  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-vocab.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
 }
 
