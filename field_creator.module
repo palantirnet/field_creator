@@ -70,10 +70,18 @@ function field_creator_build_form($form, &$form_state){
  *   A normal Drupal form_state array.
  */
 function field_creator_build_form_submit($form, &$form_state) {
-  field_creator_add_node_types();
-  field_creator_add_vocabularies();
-  field_creator_create_field_bases();
-  field_creator_create_field_instances();
+  $batch = array(
+    'title' => t('Building'),
+    'operations' => array(
+      array('field_creator_add_node_types', array()),
+      array('field_creator_add_vocabularies', array()),
+      array('field_creator_create_field_bases', array()),
+      array('field_creator_create_field_instances', array()),
+    ),
+    'finished' => 'my_finished_callback',
+    'file' => 'field_creator.install',
+  );
+  
   variable_set('menu_rebuild_needed', TRUE);
 }
 

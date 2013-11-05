@@ -49,8 +49,8 @@ function field_get_desired_node_types() {
 /**
  * Add all expected node types to the database.
  */
-function field_creator_add_node_types() {
-
+function field_creator_add_node_types(&$context) {
+  $context['message'] = t('Creating node types.');
   $types = field_get_desired_node_types();
 
   foreach ($types as $type_machine_name => $type_info) {
@@ -67,8 +67,8 @@ function field_creator_add_node_types() {
 /**
  * Load vocab data from a CSV and save any vocabularies that don't exist yet.
  */
-function field_creator_add_vocabularies() {
-
+function field_creator_add_vocabularies(&$context) {
+  $context['message'] = t('Creating vocabularies.');
   $vocab_titles_by_machine_name = field_creator_get_desired_taxonomy_vocabularies();
 
   // Insert vocabularies for every machine name that doesn't exist yet.
@@ -86,7 +86,8 @@ function field_creator_add_vocabularies() {
 /**
  * Create field bases.
  */
-function field_creator_create_field_bases() {
+function field_creator_create_field_bases(&$context) {
+  $context['message'] = t('Creating field bases.');
   // Load all the existing field bases up-front so that we don't
   // have to rebuild the cache all the time.
   field_info_cache_clear();
@@ -107,8 +108,8 @@ function field_creator_create_field_bases() {
 /**
  * Create field instances.
  */
-function field_creator_create_field_instances() {
-
+function field_creator_create_field_instances(&$context) {
+  $context['message'] = t('Creating field instances.');
   field_info_cache_clear();
   $desired_field_instances = field_creators_get_desired_field_instances();
   foreach ($desired_field_instances as $field_instance_name => $field_instance) {
