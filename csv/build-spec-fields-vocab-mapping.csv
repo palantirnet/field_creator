@@ -1,22 +1,22 @@
-Vocabulary machine name,Vocabulary label,Description
-language,Language,Cupcake ipsum dolor. Sit amet lollipop pastry applicake. Brownie cheesecake I love.
-category,Category,
-health_topics,Health Topics,
-age,Age,Cupcake ipsum dolor. Sit amet dessert. Jujubes gummi bears muffin chupa chups danish toffee tootsie roll.
-org_type,Organization Type,
-patient_type,Patient Type,
-news_type,News Type,
-condition_type,Condition type,
-staff_type,Staff Type,
-position_type,Position Type,
-gender,Gender,
-age,Age,
-event_type,Event Type,Cupcake ipsum dolor sit amet. Biscuit brownie cake. Tiramisu powder I love pudding halvah halvah sweet applicake. Topping oat cake lollipop apple pie muffin.
-event_aud_type,Event Audience Type,
-insurance,Accepted Insurances,
-location_type,Locations list,
-publication_name,Publication Name,
-clinical_expertise,Clinical Expertise,
-certifications,Certifications,
-specialties,Specialties,
-product_categories,Product Categories,
+Field label,Field machine name,Vocabulary machine name,Vocabulary label
+Language,field_refterm_language,language,Language
+Category,field_refterm_category,category,Category
+Health Topics,field_refterm_health_topics,health_topics,Health Topics
+Start of age range,field_refterm_age_start,age,Age
+Organization Type,field_refterm_org_type,org_type,Organization Type
+Patient Type,field_refterm_patient_type,patient_type,Patient Type
+News type,field_refterm_news_type,news_type,News Type
+Condition type,field_refterm_condition_type,condition_type,Condition type
+Staff type,field_refterm_staff_type,staff_type,Staff Type
+Position type,field_refterm_position_type,position_type,Position Type
+Gender,field_refterm_gender,gender,Gender
+End of age range,field_refterm_age_end,age,Age
+Event type,field_refterm_event_type,event_type,Event Type
+Event Audience Type,field_refterm_event_aud_type,event_aud_type,Event Audience Type
+Accepted Insurances,field_refterm_insurance,insurance,Accepted Insurances
+Locations list,field_refterm_location_type,location_type,Locations list
+Publication name,field_refterm_publication_name,publication_name,Publication Name
+Clinical Expertise,field_refterm_clinical_expertise,clinical_expertise,Clinical Expertise
+Certifications,field_refterm_certifications,certifications,Certifications
+Specialties,field_refterm_specialties,specialties,Specialties
+Product categories,field_refterm_product_categories,product_categories,Product Categories
