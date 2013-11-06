@@ -72,17 +72,47 @@ function field_creator_build_form($form, &$form_state){
 function field_creator_build_form_submit($form, &$form_state) {
   $batch = array(
     'title' => t('Building'),
-    'operations' => array(
-      array('field_creator_add_node_types', array()),
-      array('field_creator_add_vocabularies', array()),
-      array('field_creator_create_field_bases', array()),
-      array('field_creator_create_field_instances', array()),
-    ),
-    'finished' => 'batch_creator_finished',
+    'operations' => array(),
+    'finished' => 'field_creator_batch_finished',
     'file' => 'field_creator.install',
   );
   
-  variable_set('menu_rebuild_needed', TRUE);
+  $types = field_get_desired_node_types();
+  foreach ($types as $type_machine_name => $type_info) {
+      $batch['operations'][] = array('field_creation_batch_node_type', array($type_machine_name, $type_info));
+  }
+  
+  $vocabs = field_creator_get_desired_taxonomy_vocabularies();
+  // Insert vocabularies for every machine name that doesn't exist yet.
+  foreach ($vocabs as $vocab) {
+    $batch['operations'][] = array('field_creation_batch_vocab', array($vocab));
+  }
+  
+  // Load all the existing field bases up-front so that we don't
+  // have to rebuild the cache all the time.
+  field_info_cache_clear();
+  $existing_fields = field_info_fields();
+  // Get all the desired fields.
+  $desired_fields = field_creators_get_desired_fields();
+  // Loop over the desired fields and create them.
+  foreach ($desired_fields as $field_name => $field) {
+    // Create the field if it doesn't exist yet.
+    if (empty($existing_fields[$field_name])) {
+      $batch['operations'][] = array('field_creation_batch_field_base', array($field));
+    }
+  }
+  
+  field_info_cache_clear();
+  $desired_field_instances = field_creators_get_desired_field_instances();
+  foreach ($desired_field_instances as $field_instance_name => $field_instance) {
+    // If the field base information does not exist yet, cancel out.
+    if (!field_info_field($field_instance['field_name'])) {
+      continue;
+    }
+    $batch['operations'][] = array('field_creation_batch_field_instance', array($field_instance, $field_instance_name));
+  }
+
+  batch_set($batch);
 }
 
 /**
@@ -91,7 +121,7 @@ function field_creator_build_form_submit($form, &$form_state) {
  * @param type $results
  * @param type $operations
  */
-function batch_creator_finished($success, $results, $operations) {
+function field_creator_batch_finished($success, $results, $operations) {
   // The 'success' parameter means no fatal PHP errors were detected. All
   // other error management should be handled using 'results'.
   if ($success) {
@@ -101,6 +131,69 @@ function batch_creator_finished($success, $results, $operations) {
     $message = t('Finished with an error.');
   }
   drupal_set_message($message);
+  variable_set('menu_rebuild_needed', TRUE);
+}
+
+/**
+ * Add a node type.
+ * @param type $type_machine_name
+ * @param type $type_info
+ * @param array $context
+ */
+function field_creation_batch_node_type($type_machine_name, $type_info, &$context) {
+  $context['message'] = t('Creating node types.');
+  // If the node type doesn't exist yet, create it.
+  if (!node_type_load($type_machine_name)) {
+    node_type_save($type_info);
+  }
+  else {
+    // @todo set a warning message similar to
+    // drupal_set_message('The node type ' . $type_machine_name . ' already exists', 'warning');
+    // $context
+  }
+}
+
+/**
+ * Add a vocabulary
+ * @param type $vocab
+ * @param type $context
+ */
+function field_creation_batch_vocab($vocab, &$context) {
+  $context['message'] = t('Creating vocabularies.');
+  if (FALSE === taxonomy_vocabulary_machine_name_load($vocab['vocabulary_machine_name'])) {
+      $new_vocab = new stdClass();
+      $new_vocab->machine_name = $vocab['vocabulary_machine_name'];
+      $new_vocab->name = $vocab['vocabulary_label'];
+      $new_vocab->description = $vocab['description'];
+      taxonomy_vocabulary_save($new_vocab);
+    }
+}
+
+/**
+ * Add field base.
+ * @param type $field
+ * @param array $context
+ */
+function field_creation_batch_field_base($field, &$context) {
+  $context['message'] = t('Creating field bases.');
+  field_create_field($field);
+}
+
+/**
+ * Add field instance.
+ * @param type $field_instance
+ * @param type $field_instance_name
+ * @param array $context
+ */
+function field_creation_batch_field_instance($field_instance, $field_instance_name, &$context) {
+  $context['message'] = t('Creating field instances.');
+  // $field_instance name should look like
+  // "node-org_entity-field_text_title_short".
+  list($entity, $bundle, $field_name) = explode('-', $field_instance_name);
+  // Make sure the field instance does not exist yet.
+  if (field_info_instance($entity, $field_name, $bundle) === NULL) {
+    field_create_instance($field_instance);
+  }
 }
 
 /**
