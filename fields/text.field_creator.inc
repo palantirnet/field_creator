@@ -62,6 +62,33 @@ function text_field_creator_base() {
     'translatable' => 0,
     'type' => 'text',
   );
+  
+  // Exported field_base: 'field_text_with_summary_proto'
+  $fields['field_text_with_summary_proto'] = array(
+    'active' => 1,
+    'cardinality' => 1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_text_with_summary_proto',
+    'foreign keys' => array(
+      'format' => array(
+        'columns' => array(
+          'format' => 'format',
+        ),
+        'table' => 'filter_format',
+      ),
+    ),
+    'indexes' => array(
+      'format' => array(
+        0 => 'format',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'text',
+    'settings' => array(),
+    'translatable' => 0,
+    'type' => 'text_with_summary',
+  );
 
   return $fields;
 }
@@ -150,6 +177,48 @@ function text_field_creator_instance() {
       ),
       'type' => 'text_textfield',
       'weight' => 1,
+    ),
+  );
+  
+   // Exported field_instance: 'node-proto-field_text_with_summary_proto'
+  $field_instances['node-proto-field_text_with_summary_proto'] = array(
+    'bundle' => 'proto',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'text',
+        'settings' => array(),
+        'type' => 'text_default',
+        'weight' => 22,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_text_with_summary_proto',
+    'label' => 'Proto Text with Summary',
+    'required' => 0,
+    'settings' => array(
+      'display_summary' => 0,
+      'text_processing' => 1,
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 1,
+      'module' => 'text',
+      'settings' => array(
+        'rows' => 20,
+        'summary_rows' => 5,
+      ),
+      'type' => 'text_textarea_with_summary',
+      'weight' => 52,
     ),
   );
   
