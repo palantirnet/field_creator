@@ -57,8 +57,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
     }
   }
   elseif (strpos($field_name, 'field_refterm_') === 0) {
-    // No longer pulling in fields with Vocabs.
-    // @todo find out if this can be deleted.
+    
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
       // @todo, this section of code could be moved to a helper function.
       $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
