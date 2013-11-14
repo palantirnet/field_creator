@@ -59,9 +59,7 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
   elseif (strpos($field_name, 'field_refterm_') === 0) {
     
     if (!empty($field_config['settings']['handler_settings']['target_bundles'])) {
-      // @todo, this section of code could be moved to a helper function.
-      $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
-      $vocab_machine_names_by_field_machine_name = field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
+      $vocab_machine_names_by_field_machine_name = field_creator_get_vocab_mapping();
       if (!empty($vocab_machine_names_by_field_machine_name[$field_name])) {
         $single_target_bundle = $vocab_machine_names_by_field_machine_name[$field_name];
       }
@@ -72,6 +70,13 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
     $field_config['settings']['handler_settings']['target_bundles'] = array(
       $single_target_bundle => $single_target_bundle,
     );
+  }
+  
+  if($field_csv_settings['type'] == 'taxonomy'){
+    $vocab_machine_names_by_field_machine_name = field_creator_get_vocab_mapping();
+    if (!empty($vocab_machine_names_by_field_machine_name[$field_name])) {
+      $field_config['settings']['allowed_values'][0]['vocabulary'] = $vocab_machine_names_by_field_machine_name[$field_name];
+    }
   }
 }
 
@@ -141,4 +146,9 @@ function field_creator_get_desired_field_references() {
   module_load_include('install', 'field_creator');
   $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-reference-types.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
+}
+
+function field_creator_get_vocab_mapping(){
+  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
+  return field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
 }
