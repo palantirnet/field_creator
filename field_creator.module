@@ -78,6 +78,13 @@ function field_creator_field_creator_desired_field_config_alter(&$field_config, 
       $field_config['settings']['allowed_values'][0]['vocabulary'] = $vocab_machine_names_by_field_machine_name[$field_name];
     }
   }
+  
+  if($field_csv_settings['type'] == 'list_float' || $field_csv_settings['type'] == 'list_integer' || $field_csv_settings['type'] == 'list_text'){
+    $list_items_by_field_machine_name = field_creator_get_list_items();
+    if(!empty($list_items_by_field_machine_name[$field_name])){
+      $field_config['settings']['allowed_values'] = $list_items_by_field_machine_name[$field_name];
+    }
+  }
 }
 
 /**
@@ -143,12 +150,36 @@ function field_creator_load_includes() {
  * An array of refrence fields as keys and the CT being refrenced.
  */
 function field_creator_get_desired_field_references() {
-  module_load_include('install', 'field_creator');
   $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-reference-types.csv';
   return field_creator_getMappingFromCSV($base_fields_csv_path, 0, 1);
 }
 
 function field_creator_get_vocab_mapping(){
-  $base_fields_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
-  return field_creator_getMappingFromCSV($base_fields_csv_path, 1, 2);
+  $vocab_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-vocab-mapping.csv';
+  return field_creator_getMappingFromCSV($vocab_csv_path, 1, 2);
+}
+
+function field_creator_get_list_items(){
+  $field_lists_csv_path = drupal_get_path('module', 'field_creator') . '/csv/build-spec-fields-list-items.csv';
+  $field_lists_raw = field_creator_getMappingFromCSV($field_lists_csv_path, 0, 1);
+  $field_lists_keyed = array();
+  
+  foreach($field_lists_raw as $field => $list_string){
+    if ($list = explode( ';', $list_string )){
+      // create parts
+      foreach ( $list as $key_value ){
+        // key -> value pair or single value
+        $key_list = explode( '|', $key_value );
+
+        if( trim($key_list[1]) ){
+          $key_arr[trim($key_list[0])] = trim($key_list[1]);
+        }
+        else{
+          $key_arr[] = trim($key_list[0]);
+        }
+      }
+    }
+    $field_lists_keyed[$field] = $key_arr;
+  }
+  return $field_lists_keyed;
 }
