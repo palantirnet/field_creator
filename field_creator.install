@@ -92,7 +92,7 @@ function field_creator_add_vocabularies() {
  */
 function field_creator_create_field_bases() {
   // Load all the existing field bases up-front so that we don't
-  // have to rebuild the cache all the time.
+  // have to rebuild the cache all the 
   field_info_cache_clear();
   $existing_fields = field_info_fields();
   // Get all the desired fields.
@@ -463,15 +463,24 @@ function fields_creator_get_prototypical_field_names_by_type() {
   return array(
     'text_long' => 'field_text_long_proto',
     'text' => 'field_text_proto',
+    'text_with_summary' => 'field_text_with_summary_proto',
     'addressfield' => 'field_address_proto',
     'datetime' => 'field_date_proto',
+    'date' => 'field_date_iso_proto',
+    'datestamp' => 'field_datestamp_proto',
     'email' => 'field_email_proto',
     'link_field' => 'field_links_proto',
+    'number_decimal' => 'field_decimal_proto',
+    'number_float' => 'field_float_proto',
     'number_integer' => 'field_int_proto',
     'list_boolean' => 'field_boolean_proto',
+    'list_float' => 'field_list_float_proto',
+    'list_integer' => 'field_list_integer_proto',
+    'list_text' => 'field_list_text_proto',
     'file' => 'field_files_proto',
     'image' => 'field_image_proto',
     'name' => 'field_name_proto',
+    'taxonomy_term_reference' => 'field_term_reference_proto',
   );
 }
 
@@ -482,15 +491,24 @@ function fields_creator_get_prototypical_field_instances_by_type() {
   return array(
     'text_long' => 'node-proto-field_text_long_proto',
     'text' => 'node-proto-field_text_proto',
+    'text_with_summary' => 'node-proto-field_text_with_summary_proto',
     'addressfield' => 'node-proto-field_address_proto',
     'datetime' => 'node-proto-field_date_proto',
+    'date' => 'node-proto-field_date_iso_proto',
+    'datestamp' => 'node-proto-field_datestamp_proto',
     'email' => 'node-proto-field_email_proto',
     'link_field' => 'node-proto-field_links_proto',
+    'number_decimal' => 'node-proto-field_decimal_proto',
+    'number_float' => 'node-proto-field_float_proto',
     'number_integer' => 'node-proto-field_int_proto',
     'list_boolean' => 'node-proto-field_boolean_proto',
+    'list_float' => 'node-proto-field_list_float_proto',
+    'list_integer' => 'node-proto-field_list_integer_proto',
+    'list_text' => 'node-proto-field_list_text_proto',
     'file' => 'node-proto-field_files_proto',
     'image' => 'node-proto-field_image_proto',
     'name' => 'node-proto-field_name_proto',
+    'taxonomy_term_reference' => 'node-proto-field_term_reference_proto',
   );
 }
 
