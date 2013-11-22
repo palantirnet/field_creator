@@ -1,24 +1,3 @@
 Vocabulary machine name,Vocabulary label,Description
-language,Language,Cupcake ipsum dolor. Sit amet lollipop pastry applicake. Brownie cheesecake I love.
-category,Category,
-health_topics,Health Topics,
-age,Age,Cupcake ipsum dolor. Sit amet dessert. Jujubes gummi bears muffin chupa chups danish toffee tootsie roll.
-org_type,Organization Type,
-patient_type,Patient Type,
-news_type,News Type,
-condition_type,Condition type,
-staff_type,Staff Type,
-position_type,Position Type,
-gender,Gender,
-age,Age,
-event_type,Event Type,Cupcake ipsum dolor sit amet. Biscuit brownie cake. Tiramisu powder I love pudding halvah halvah sweet applicake. Topping oat cake lollipop apple pie muffin.
-event_aud_type,Event Audience Type,
-insurance,Accepted Insurances,
-location_type,Locations list,
-publication_name,Publication Name,
-clinical_expertise,Clinical Expertise,
-certifications,Certifications,
-specialties,Specialties,
-product_categories,Product Categories,
-
-@todo, rename this file, to build-spec-vocabs
+language,Language,A list of languages
+type,Type,A list of types

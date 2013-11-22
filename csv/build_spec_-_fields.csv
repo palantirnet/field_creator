@@ -1,208 +1,25 @@
 Name,Machine name,Type,Required,# Values,Field settings,Default,Help text,Notes,Open questions / blockers
-Common fields A,,,,,,,,,
 Title,title,"title
-",,1,,,,Using core titles for nodes and files,n
-,,,,,,,,,
-Short Title,field_text_title_short,text,,1,255 max length,,,Still need confirmation on default length,Y
-,,,,,,,,,
-Common fields B,,,,,,,,,
-meta title,Should be handled by https://drupal.org/project/metatag,,,,,,,check how this works with File entity -- It works.,n
-meta-description,Should be handled by https://drupal.org/project/metatag,,,,,,,,n
-meta keywords,Should be handled by https://drupal.org/project/metatag,,,,,,,,n
-Date of last internal review,field_date_reviewed_internal,datetime,,1,,,,,N
-,,,,,,,,,
-Common fields C,,,,,,,,,
-Body,field_text_body,text_long,,1,user-specified format,blank,,,N
-,,,,,,,,,
-Common fields D,,,,,,,,,
-Teaser/Lede,field_text_lede,text_long,,1,user-specified format,blank,,,N
-,,,,,,,,,
-,,,,,,,,,
-Common fields E,,,,,,,,,
-Review Date (Public),field_date_reviewed_public,datetime,,1,,,"The publicly viewable ""Last reviewed"" date.",LEENA WILL GET BACK TO US ON DISPLAY FORMATTING,Y
-,,,,,,,,,
-Common fields F,,,,,,,,,
-Langauge,field_refterm_language,entityreference,,Unlimited,"references the taxonomy ""languages"". Check boxes",blank,,,N
-,,,,,,,,,
-Common fields G,,,,,,,,,
-Intro,field_text_intro,text_long,,1,user-specified format,blank,,The intro field may need a more restricted set of html tags,
-,,,,,,,,,
-Scheduled publishing and unpublishing fields,,postponed,,,,,,This use case will likely get satisfied with Workbench Moderation / State Machine. Can we postpone action on this question?,Y
-Org Entity,,,,,,,,,
-Organization Type,field_refterm_org_type,entityreference,,1,,,,,N
-,,,,,,,,,
-Patient Story,,,,,,,,,
-Patient Name,field_text_patient_name,text,,1,255 max length,,,,N
-,,,,,,,,,
-Visitor resources,,,,,,,,,
-Link/url,field_links,link_field,,unlimited,Make the Link text optional.,,,"I could see an argument for making this multivalue. The node might describe two specific pages on healthcare.gov. This field could link to both. Also, I am using the generic ""field_link"" because I intend to use it on both Visitor Resources Health Resources as this field means ""the real thing that this node exists to link to"" --- Yes this should be shared to Health resources",N
-,,,,,,,,,
-,,,,,,,,,
-Clinical Pathways,,,,,,,,,
-Date Posted,field_date_posted,datetime,N,1,,,This is the publicly viewable posted date,,N
-Revised date,field_date_revised,datetime,N,1,,,,,N
-Patient Type,field_refterm_patient_type,entityreference,,Unlimited,,,,,N
-"Author(s)
-",field_ref_persons_author,entityreference,N,Unlimited,,,,,n
-,,,,,,,,,
-General Page,,,,,,,,,
-See Also,field_ref_see_also,entityreference,N,Unlimited,,,,We might need to exclude some node types later,n
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-Location,,,,,,,,,
-Amenities,field_text_amenities,text_long,,1,,,,,N
-Hours,,postpone,,,,,,This use needs much more definition. On a call we assigned someone at CHOP the task of compiling all the hours. I don't remember who got that task. We need to make a ticket.,n
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-Location Alerts,,,,,,,,,
-Date Range,field_date_active_range,datetime,Y,1,Require an end date,,,,N
-,,,,,,,,,
-News,,,,,,,,,
-News type,field_refterm_news_type,entityreference,Y,1,,,,"Media Placement, Press Release, News",N
-Subtitle,field_text_subtitle,text,N,1,limit 512,,,,Y
-Date published,field_date_published_externally,datetime,,1,,,,"Although the meaning of an external publishing date (The 2013-09-09 issue of newsweek) is different from the meaning of ""date posted on this website"" we might be able to use the same field for both, as in ""this is the date we are telling the public is the date for this news item""",Y
-,,,,,,,,,
-Link to original publication,field_links_original,link_field,,unlimited,,,A link to the original publication of this news story.,"I suppose we could reuse field_link for this concept. But field_link is multivalue.Hmm, in looking for an example link on the New York Times I found a case where this field might need to be multivalue: http://www.nytimes.com/2012/12/10/health/a-breakthrough-against-leukemia-using-altered-t-cells.html?pagewanted=all and http://www.nytimes.com/slideshow/2012/12/10/health/20121209-leukemia.html?_r=0",n
-,,,,,,,,,
-,,,,,,,,,
-Product,,,,,,,,,
-Price,field_text_price,text,Y,1,,,,,N
-Available in Spanish?,field_boolean_spanish,list_boolean,,1,,,,,N
-,,,,,,,,,
-,,,,,,,,,
-Event,,,,,,,,,
-Event date,field_dates_event,datetime,,unlimited,Needs to use start and end. And Date Repeat module,,,,n
-Venue,field_text_venue,text_long,N,1,,,,,N
-Venue directions,field_text_venue_directions,text_long,N,1,,,,,N
-Description,field_text_body,text_long,,1,,,,How is this different from field_body? Sean and I think it is not. Reconfirm with James,Y
-Registration Link,field_link_registration,link_field,N,1,Link text optional,,,,N
-External links,reuse field_links,,,1,,,,,N
-Contact Phone Number,field_text_phone,text,N,1,,,,,
-Email,field_email,email,,1,,,,Use email module,N
-Eventbrite ID,field_text_eventbrite,text,N,1,,,,,N
-,,,,,,,,,
-,,,,,,,,,
-PFE,,,,,,,,,
-Publication number,field_text_publication_number,text,N,1,"255 length
-",,,,N
-Written date,field_date_written,datetime,,1,,,,,N
-Revised date,field_date_revised,datetime,,1,,,,SAME FIELD AS CLINICAL PATHWAYS,N
-Renumbered Date,field_date_renumbered,datetime,Y,1,,,,,
-Review date,field_date_reviewed_internal,datetime,,,,,,"There are other content types with ""review date"" how is this one different? This is a shared field.","n
-"
-Long text,copyright,,,,,,,,
-,,,,,,,,,
-Condition,,,,,,,,,
-Condition type,field_refterm_condition_type,entityreference,N,1,,,,,n
-Intro,field_text_intro,text_long,N,1,,,,"This is a common field
-",n
-,,,,,,,,,
-Person,,,,,,,,,
-First,field_name,name,,,,,,Are we sure we should use name module? I have never used it before -Yes,n
-Middle Name,field_name,name,,,,,,met by name module,n
-Last Name,field_name,name,,,,,,,n
-Display Name,title,title,Y,1,,,,,N
-Staff type,field_refterm_staff_type,entityreference,,1,,,,,n
-Position type,field_refterm_position_type,entityreference,,1,,,,,n
-Credentials,field_text_credentials,text_long,N,1,,,,,n
-Narrative Bios,field_text_narrative_bios,text_long,Y,1,,,,,n
-Gender,field_refterm_gender,entityreference,,1,,,,,n
-Chop title,field_text_chop_title,text,n,1,length 255,,,,n
-Chop Start,field_date_chop_start,datetime,n,1,,,The date this person started at CHOP,,n
-Penn Academic Title,field_text_penn_title,text_long,,1,,,,,n
-Year Appointed,field_int_year_appointed,number_integer,,1,,,,"If this is only storing an integer of a year, shouldn't it be an integer field? - Confirm Solr could handle integers as dates",Y
-Research Interests,field_text_research_interests,text_long,,1,,,,,n
-Phone,field_address_phone_only,addressfield,,unlimited,,,,use addressfield_phone,n
-Email,field_email,email,,1,,,,,n
-Awards,field_text_awards,text_long,,1,,,,,n
-Editorial and Academic positions,field_text_ed_ac_positions,text_long,,,,,,,n
-Leaderships,field_text_leaderships,text_long,,1,,,,,n
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-Reference fields,,,,,,,,,
-Related Organization Entities,field_ref_org_entities,entityreference,,unlimited,,,,,n
-Related Services,field_ref_services,entityreference,,unlimited,,,,,n
-Related Locations,field_ref_locations,entityreference,,unlimited,,,,,n
-Related Events,field_ref_events,entityreference,,unlimited,,,,,n
-Related Conditions,field_ref_conditions,entityreference,,unlimited,,,,,n
-Related Files,field_files,file,,umlimited,,,,,N
-Category,field_refterm_category,entityreference,,1,,,,,n
-Related people,field_ref_persons,entityreference,,unlimited,,,,,n
-Video,field_file_video,file,,1,,,,,n
+",,1,This is another column for notes,,,Using core titles for nodes and files,n
+Short Title,field_text_title_short,text,,1,,Field creator,,,Y
+body,field_text_body,text_long,y,1,,,,,
+Text List,field_text_list,list_text,n,unlimited,,,This is a test text list,,
+Text with summary,field_text_with_summary,text_with_summary,y,1,,,,,
+Address,field_address_,addressfield,N,1,,,,,n
+Datetime,field_datetime,datetime,n,1,,,,,
+Date,field_date,date,Y,2,,,,,
+Datestamp,field_datestamp,datestamp,n,1,,,,,
+Email,field_email,email,n,unlimited,,,,,
+Link,field_link,link_field,,unlimited,,,,,
+Decimal,field_decimal,number_decimal,N,3,,,,,
+Float,field_float,number_float,n,5,,,,,
+Integer,field_integer,number_integer,Y,1,,,,,
+boolean,field_boolean,list_boolean,,1,,,,,N
+Float list,field_float_list,list_float,n,1,,,,,
+Integer List,field_integer_list,list_integer,n,2,,,,,
+Files,field_files,file,,unlimited,,,,,N
 Image,field_image,image,,1,,,,,n
-Health Topics,field_refterm_health_topics,entityreference,,unlimited,,,,,n
-Video,field_ref_video,entityreference,,1,,,,,
-Condition,,,,,,,,,
-Start of age range,field_refterm_age_start,entityreference,,1,,,,,n
-End of age range,field_refterm_age_end,entityreference,,1,,,,,n
-,,,,,,,,,
-,,,,,,,,,
-Slideshow,field_ref_slideshow,entityreference,,1,,,,,n
-,,,,,,,,,
-Events,,,,,,,,,
-Event type,field_refterm_event_type,entityreference,,1,,,,,n
-Event Audience Type,field_refterm_event_aud_type,entityreference,,1,,,,This machine name might be too long,n
-,,,,,,,,,
-,,,,,,,,,
-Location,,,,,,,,,
-Accepted Insurances,field_refterm_insurance,entityreference,,unlimited,,,,,n
-Location entity,field_address,addressfield,,,,,,,n
-Locations list,field_refterm_location_type,entityreference,,unlimited,,,,,n
-,,,,,,,,,
-,,,,,,,,,
-News,,,,,,,,,
-Related General Pages,field_ref_pages,entityreference,,unlimited,,,,,N
-,,,,,,,,,
-Contact name,field_ref_person_contact,entityreference,,1,,,,,N
-Publication name,field_refterm_publication_name,entityreference,,1,,,,,n
-,,,,,,,,,
-Organization Entity,,,,,,,,,
-Parent Org entities,field_ref_org_entities_parents,entityreference,,unlimited,,,,,n
-,,,,,,,,,
-,,,,,,,,,
-Patient Story,,,,,,,,,N
-Related Treatments,field_ref_treatments,entityreference,,unlimited,,,,,
-,,,,,,,,,
-Person,,,,,,,,,
-Clinical Expertise,field_refterm_clinical_expertise,entityreference,,unlimited,,,,,n
-Certifications,field_refterm_certifications,entityreference,,unlimited,,,,,n
-Specialties,field_refterm_specialties,entityreference,,unlimited,,,,,n
-,,,,,,,,,
-Product,,,,,,,,,
-Product categories,field_refterm_product_categories,entityreference,,unlimited,,,,,n
-,,,,,,,,,
-Slideshow,,,,,,,,,
-Slides,field_image_slides,image,,unlimited,,,,,
-Person?,,,,,,,"Why is the arrow from slideshow to person singluar?
-
-- SHOULD BE MULTI",,n
-,,,,,,,,,
-,,,,,,,,,
-Testimonial,,,,,,,,,
-File,,,,,,,"Why is the arrow from Testimonial to file singular?
-
-- SHOULD BE MULTI",,n
-,,,,,,,,,
-Video,,,,,,,,,
-Person,,,,,,,Why is the arrrow from Video to Person singular?- SHOULD BE MULTI,,n
-Transcripts,field_files_transcripts,file,,unlimited,,,,,n
-File,field_file,file,,1,,,,,n
-Closed Captions,field_files_closed_captions,file,,unlimited,,,,,n
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-,,,,,,,,,
-UUID,field_text_legacy_uuid,text,,1,,,,,
-Legacy Name,field_text_legacy_name,text,,1,,,,,
-Legacy SEO Title,field_text_legacy_seo_title,text,,1,,,,,
-Legacy SEO Keywords,field_text_legacy_seo_keywords,text,,unlimited,,,,,
-Legacy SEO Categories,field_text_legacy_seo_category,text,,unlimited,,,,,
-Legacy SEO Description,field_text_legacy_seo_descr,text_long,,1,,,,,
-Legacy Body,field_text_legacy_body,text_long,,,,,,,
-Legacy Status,field_text_legacy_status,text,,1,,,,,
+Name,field_name,name,y,1,,,,,n
+Taxonomy term ref,field_taxonomy_term_ref,taxonomy_term_reference,n,1,,,,,
+Entityreference Taxonomy example,field_refterm_example,entityreference,n,1,,,,all Taxonomy reference fields using entity reference need to start with field_refterm_,
+Entityreference Node example,field_ref_example,entityreference,n,1,,,,All Node reference fields using entity reference need to start with field_ref_,
